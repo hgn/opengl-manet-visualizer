@@ -1,0 +1,27 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+def build(bld):
+
+  main              = bld.create_obj('cc', 'program')
+  main.source       = [
+			'manet-visualizer.c',
+			'util.c',
+			'gl-texture.c',
+			'gl-skybox.c',
+			'gl-display.c',
+			'gl-ground.c',
+			'gl-node.c',
+			'gl-model-loader.c',
+			'gl-terrain.c',
+			'event.c',
+			'node.c',
+			'scenario.c',
+			'time.c',
+			'trace-parser.c',
+			]
+  main.target       = 'network-visualizer'
+  main.includes     = '. /usr/include ../src'
+  main.ccflags      = '-Wmain'
+  main.uselib       = 'X11 Xi Xmu glut GL GLU'
+
