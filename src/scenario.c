@@ -28,6 +28,8 @@ struct scenario *alloc_scenario(void)
 	INIT_LIST_HEAD(&scenario->node_list);
 	INIT_LIST_HEAD(&scenario->event_list);
 
+	scenario->events_in_queue = 0;
+
 	return scenario;
 }
 

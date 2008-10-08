@@ -27,69 +27,65 @@ int main(int ac, char **av)
 
 	setlocale(LC_ALL, "C");
 
-	scenario = parse_offline_scenario(TRACE_FILE_NS2, "/home/pfeifer/tracefile.tr");
+	scenario = parse_offline_scenario(TRACE_FILE_NS2, "/usr/share/manet-visualizer/traces/ns2-new-wireless.tr");
 	print_nodes_info(scenario);
 
 	a_ev_l = init_active_event_list();
 	setup_simulator_ref_time();
 
-
 	glutInit(&ac, av);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(800, 600);
-	glutCreateWindow("Skybox");
+	glutCreateWindow("Manet Visualizer");
 
-	scenario = parse_offline_scenario(TRACE_FILE_DEFAULT, "/home/pfeifer/tracefile.tr");
-	//print_trace_file_info(scenario);
-
-	// Fonction callback de glut
+	/* main gl handler */
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 	glutSpecialFunc(special);
 
-	//glutKeyboardUpFunc(keyboadup);
+	/* user input handler */
 	glutKeyboardFunc(keyboard);
 	glutPassiveMotionFunc(mouseMovement);
 
+	/* initalize mv specific routines */
 	init_skybox();
-
 	init_terrain();
-
 	init_nodes();
-
 	init_ground();
 
 	while (23) {
 
 		double s_time;
-		struct event *next_event;
+		struct event *next_event = NULL;
+
 
 		s_time = simulator_time();
 		next_event = peek_next_event();
 
-		while (s_time >= next_event->time) {
+		while (next_event && s_time >= next_event->time) {
 
 			/* remove event from the global
 			 * event queue cause the event
 			 * is now processed in the active event list (a_ev_l)
 			 */
-			list_del(&next_event->list);
+			//list_del(&next_event->list);
 
 			/* process all event in queue */
-			activate_event(next_event, a_ev_l);
-			next_event = peek_next_event();
+			//activate_event(next_event, a_ev_l);
+			//next_event = peek_next_event();
 		}
 
 		/* display all event that are active now
 		 * debug_display_nodes is also responsible to
 		 * remove outdatet elements
 		 */
-		debug_display_events(a_ev_l);
+		//debug_display_events(a_ev_l);
 
 		/* and display the positions of the nodes
 		 * at time s_time
 		 */
-		debug_display_nodes_coordinates_at_time(scenario, s_time);
+		//debug_display_nodes_coordinates_at_time(scenario, s_time);
+
 
 
 		glutMainLoop();

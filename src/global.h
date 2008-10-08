@@ -92,6 +92,8 @@ struct scenario {
 
 	struct list_head node_list;
 	struct list_head event_list;
+
+	uint32_t events_in_queue;
 };
 
 

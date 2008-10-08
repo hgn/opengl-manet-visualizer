@@ -69,13 +69,24 @@ void debug_display_events(struct list_head *a_ev_l)
  * The caller is responsible to handle the event
  * in a proper way
  */
-struct event *peek_next_event(struct scenario *s)
+struct event *peek_next_event(struct scenario *sc)
 {
 	struct event *ev;
 
-	assert(s);
+	assert(sc);
 
-	ev = list_first_entry(&s->event_list, struct event, list);
+#if 0
+	if (sc->events_in_queue == 0)
+		return NULL;
+#endif
+
+	sc->events_in_queue--;
+
+	fprintf(stderr, "event in queue: %u\n", sc->events_in_queue);
+
+	ev = list_first_entry(&sc->event_list, struct event, list);
+	if (!ev)
+		return NULL;
 
 	return ev;
 }
@@ -106,6 +117,8 @@ void add_event(struct scenario *s, double time, uint32_t type, void *data)
 
 	INIT_LIST_HEAD(&e->list);
 	list_add(&e->list, &s->event_list);
+
+	s->events_in_queue++;
 
 	assert(s);
 }

@@ -45,7 +45,7 @@ static void calculateNormal( float *coord1, float *coord2, float *coord3 )
 
 int init_nodes(void)
 {
-	load_model_3ds(&object,"models/misc/sphere.3ds");
+	load_model_3ds(&object, "/usr/share/manet-visualizer/3d-models/misc/sphere.3ds");
 
 	return 1;
 }

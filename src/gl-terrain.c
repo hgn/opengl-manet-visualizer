@@ -49,7 +49,7 @@ int init_terrain(void)
 	max_z = 50;
 
 	/* load textures required textures */
-	image = load_image("textures/ground-01/grass.bmp", BMP_TYPE);
+	image = load_image("/usr/share/manet-visualizer/textures/ground-01/grass.bmp", BMP_TYPE);
 	if (!image)
 		die("Can't load texture for skydome");
 

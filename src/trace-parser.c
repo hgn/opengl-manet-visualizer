@@ -23,13 +23,13 @@
 #include <assert.h>
 
 
-#define	EVENT_TYPE 0
-#define	TIME 2
-#define	NODE_ID 4
-#define	POS_X 6
-#define	POS_Y 8
+#define	NS2_TR_EV_TYPE 0
+#define	NS2_TR_TIME    2
+#define	NS2_TR_NODE_ID 8
+#define	NS2_TR_POS_X   10
+#define	NS2_TR_POS_Y   12
+#define	NS2_TR_PROTO_L 19
 
-#define	PROTO_L 10
 
 int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
 {
@@ -40,7 +40,7 @@ int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
 	assert(s);
 
 	/* some sanity checks first */
-	if (!data[TIME] || !data[NODE_ID] || !data[POS_X] || !data[POS_Y])
+	if (!data[NS2_TR_TIME] || !data[NS2_TR_NODE_ID] || !data[NS2_TR_POS_X] || !data[NS2_TR_POS_Y])
 		return 0;
 
 	/*
@@ -48,10 +48,10 @@ int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
 			data[TIME], data[NODE_ID], data[POS_X], data[POS_Y]);
 			*/
 
-	mtime   = strtod(data[TIME], NULL);
-	nodeid = atoi(data[NODE_ID]);
-	x      = atoi(data[POS_X]);
-	y      = atoi(data[POS_Y]);
+	mtime   = strtod(data[NS2_TR_TIME], NULL);
+	nodeid = atoi(data[NS2_TR_NODE_ID]);
+	x      = atoi(data[NS2_TR_POS_X]);
+	y      = atoi(data[NS2_TR_POS_Y]);
 
 	node = get_node_by_id(s, nodeid);
 	if (!node) {
@@ -66,17 +66,31 @@ int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
 	return 0;
 }
 
+/**
+ * This routine categorize all events necessary for
+ * displaying. This is concerns all packet transmission
+ * like agt or olsr routing packets. As a rule of thumb:
+ * detect here all what you want to display.
+ */
 static enum event_type categorize_event(char *data[])
 {
-	if (!strcmp(data[PROTO_L], "agt")) {
+	/* it is a valid date that a line is not always
+	 * of the same length -> sanity checks first */
+	if (!data[NS2_TR_PROTO_L])
+		return ET_UNKNOWN;
+
+	if (!strcmp(data[NS2_TR_PROTO_L], "AGT")) {
 		return ET_CBR_IN;
 	} else {
 		return ET_UNKNOWN;
 	}
 }
 
+#define	DATA_IN 1
+
 static void entail_cbr_in(struct scenario *s, char *time)
 {
+	add_event(s, time, DATA_IN, NULL);
 }
 
 
@@ -88,17 +102,18 @@ void parse_ns2_new_wireless_event(struct scenario *s, char *data[])
 {
 	enum event_type et;
 
-	assert(s);
+	assert(s && data[NS2_TR_TIME]);
 
 	/* categorize event */
 	et = categorize_event(data);
 
 	switch (et) {
 		case ET_CBR_IN:
-			entail_cbr_in(s, data[TIME]);
+			entail_cbr_in(s, data[NS2_TR_TIME]);
 			break;
-		case ET_UNKNOWN: /* fall through */
-			fprintf(stderr, "Parser error, data within the trace file seems to be corrupt\n");
+		case ET_UNKNOWN:
+			/* packet is not handled or even recognized
+			 * so ignore it here */
 			break;
 		default:
 			fprintf(stderr, "Programmed error in switch/case statement\n");
@@ -106,6 +121,7 @@ void parse_ns2_new_wireless_event(struct scenario *s, char *data[])
 	}
 }
 
+#define	IA_SIZE 128
 
 static struct scenario *parse_ns2_new_wireless_scenario(const char *file)
 {
@@ -114,9 +130,10 @@ static struct scenario *parse_ns2_new_wireless_scenario(const char *file)
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
+	unsigned int first_round, line_no;
+
 
 	scenario = alloc_scenario();
-
 
 	fp = fopen(file, "r");
 	if (fp == NULL) {
@@ -125,15 +142,15 @@ static struct scenario *parse_ns2_new_wireless_scenario(const char *file)
 		exit(EXIT_FAILURE);
 	}
 
-	int first_round = 1;
+	line_no = first_round = 1;
 
 	while ((read = getline(&line, &len, fp)) != -1) {
 
 		int iter;
-		char *data[64];
+		char *data[IA_SIZE];
 
 		/* null out point array  */
-		for (iter = 0; iter < 64; iter++)
+		for (iter = 0; iter < IA_SIZE; iter++)
 			data[iter] = NULL;
 
 		/* format description:
@@ -144,29 +161,25 @@ static struct scenario *parse_ns2_new_wireless_scenario(const char *file)
 
 		data[iter++] = strtok(line, " ");
 
-		while ((data[iter++] = strtok(NULL, " ")))
+		while (iter < IA_SIZE && (data[iter++] = strtok(NULL, " ")))
 			;
 
-#if 0
-		FIXME: active this later if the format is clearly parsed
-		if (iter != 20) {
-			fprintf(stderr, "line %s seems to be no valid ns2 trace line, ignoring ...\n");
-			continue;
-		}
-#endif
+	   /* ok, this is a valid line, because every line in the new trace file
+		* format contains the actuall position of the particular new we
+		* enqueue this information here. Parsing and validy checks are done
+		* by the function self */
 
-		/* ok, this is a valid line, because every line in the new trace file
-		 * format contains the actuall position of the particular new we
-		 * enqueue this information here. Parsing and validy checks are done
-		 * by the function self */
-		parse_ns2_new_wireless_position(scenario, data);
 
-		/* now we save event relevant information like the reception
-		 * of a data packet et cetera */
-		parse_ns2_new_wireless_event(scenario, data);
+	   parse_ns2_new_wireless_position(scenario, data);
+
+
+	   /* now we save event relevant information like the reception
+		* of a data packet et cetera */
+	   parse_ns2_new_wireless_event(scenario, data);
+
+	   line_no++;
 
 	}
-
 
 	if (line)
 		free(line);
@@ -174,7 +187,6 @@ static struct scenario *parse_ns2_new_wireless_scenario(const char *file)
 	fclose(fp);
 
 	return scenario;
-
 }
 
 struct scenario *parse_offline_scenario(int format, const char *filename)
