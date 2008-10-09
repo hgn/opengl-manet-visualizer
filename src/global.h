@@ -115,8 +115,9 @@ void display(void);
 void special(int, int, int);
 void keyboard(unsigned char, int, int);
 
-/* node.c */
+/* gl_node.c */
 int init_nodes(void);
+void map_draw_nodes(void);
 
 /* util.c */
 void *xalloc(size_t);
@@ -153,7 +154,7 @@ struct event *peek_next_event(struct scenario *);
 struct scenario *parse_offline_scenario(int, const char *);
 void print_trace_file_info(struct scenario *);
 
-int get_node_pos_by_time(uint32_t, double, int32_t *, int32_t *);
+int get_node_pos_by_time(struct node *, double, int32_t *, int32_t *);
 
 void print_event_info(struct event *);
 struct list_head *init_active_event_list(void);

@@ -21,20 +21,42 @@
 #include <inttypes.h>
 #include <assert.h>
 
-int get_node_pos_by_time(uint32_t node_id, double search_time, int32_t *x, int32_t *y)
+
+int get_node_pos_by_time(struct node *node, double search_time, int32_t *x, int32_t *y)
 {
+	struct list_head *iter;
+	struct position *coordinate;
+	struct position *co_prev, *co_next;
+	struct position null_position;
+	int32_t w_next_x, w_prev_x;
+	int32_t w_next_y, w_prev_y;
+	double t_next, t_prev;
 
-	(void) node_id;
+	memset(&null_position, 0, sizeof(struct position));
 
-	//struct node *node;
-	/* iterate through node list and fetch node */
+	co_prev = co_next = NULL;
 
 	/* iterate through position list and
 	 * get previous time, following time
 	 * as well as the corresponding coordinates
 	 */
 
-	//struct coordinate *coordinate;
+	co_prev = co_next = &null_position;
+
+
+	__list_for_each(iter, &(node->position_list)) {
+		coordinate = list_entry(iter, struct position, list);
+		co_next = coordinate;
+		if (co_next->time >= search_time)
+			break;
+		co_prev = co_next;
+	}
+
+	w_next_x = co_next->x; w_next_y = co_next->y;
+	w_prev_x = co_prev->x; w_prev_y = co_prev->y;
+	t_next = co_next->time;
+	t_prev = co_prev->time;
+
 
 	/* do the calculation for time search_time:
 	 *
@@ -50,9 +72,6 @@ int get_node_pos_by_time(uint32_t node_id, double search_time, int32_t *x, int32
 	 *  if t_next of t_prev IS search time we
 	 *  return instantly the right coordinates.
 	 */
-	int32_t w_next_x, w_prev_x;
-	int32_t w_next_y, w_prev_y;
-	double t_next, t_prev;
 
 	double t_t = search_time;
 

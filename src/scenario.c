@@ -43,18 +43,6 @@ int add_node_to_scenario(struct scenario *s, struct node *n)
 	return 0;
 }
 
-void print_nodes_info(struct scenario *s)
-{
-	struct list_head *iter;
-	struct node *node_ptr;
-
-	assert(s);
-
-	__list_for_each(iter, &(s->node_list)) {
-		node_ptr = list_entry(iter, struct node, list);
-		print_node_info(node_ptr);
-	}
-}
 
 void debug_display_nodes_coordinates_at_time(struct scenario *s, double s_time)
 {

@@ -17,6 +17,10 @@
 */
 
 #include "global.h"
+#include <assert.h>
+
+
+extern struct scenario *scenario;
 
 obj_type object;				//3DS object, in this case a vintage gun
 
@@ -48,6 +52,27 @@ int init_nodes(void)
 	load_model_3ds(&object, "/usr/share/manet-visualizer/3d-models/misc/sphere.3ds");
 
 	return 1;
+}
+
+void map_draw_nodes(void)
+{
+	/* iterate over all nodes */
+	struct list_head *iter;
+	struct node *node_ptr;
+	double s_time;
+	int32_t x, y;
+
+	assert(scenario);
+
+	s_time = simulator_time();
+
+	x = y = 0;
+
+	__list_for_each(iter, &(scenario->node_list)) {
+		node_ptr = list_entry(iter, struct node, list);
+		get_node_pos_by_time(node_ptr, s_time, &x, &y);
+		fprintf(stderr, "node %d [x:%d,y:%d]\n", node_ptr->id, x, y);
+	}
 }
 
 

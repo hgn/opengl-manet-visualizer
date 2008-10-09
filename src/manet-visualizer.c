@@ -80,7 +80,6 @@ int main(int ac, char **av)
 	print_cli_teaser();
 
 	scenario = parse_offline_scenario(TRACE_FILE_NS2, "/usr/share/manet-visualizer/traces/ns2-new-wireless.tr");
-	print_nodes_info(scenario);
 
 	a_ev_l = init_active_event_list();
 	setup_simulator_ref_time();

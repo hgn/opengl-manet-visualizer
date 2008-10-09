@@ -232,6 +232,9 @@ void display(void)
 #endif
 
 
+	map_draw_nodes();
+
+
 	GLUquadricObj *cyl;
 	cyl = gluNewQuadric();
 
