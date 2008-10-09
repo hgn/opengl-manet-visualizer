@@ -60,6 +60,9 @@ static void draw_node_at_pos(struct node *node, int32_t x, int32_t y)
 	cyl = gluNewQuadric();
 
 
+	glEnable(GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	glPushMatrix();
 
 	glColor3f( 0.0f, 0.0f, 1.0f );
@@ -67,6 +70,17 @@ static void draw_node_at_pos(struct node *node, int32_t x, int32_t y)
 	gluQuadricDrawStyle(cyl, GLU_LINE);
 	draw_nodes();
 
+	glPopMatrix();
+
+	glPushMatrix();
+	glColor4f( 0.0f, 0.0f, 1.0f, 0.4f);
+	glRotatef(90., 1., 0., 0.);
+	glTranslatef((float)x/10, (float)y/10, .9f);	// move z units out from the screen.
+	GLUquadricObj *quadratic1;
+	quadratic1=gluNewQuadric();			// Create A Pointer To The Quadric Object ( NEW )
+	gluQuadricNormals(quadratic1, GLU_SMOOTH);	// Create Smooth Normals ( NEW )
+	gluQuadricTexture(quadratic1, GL_TRUE);		// Create Texture Coords ( NEW )
+	gluDisk(quadratic1,0.2f,2.5f,32,32);
 	glPopMatrix();
 }
 
