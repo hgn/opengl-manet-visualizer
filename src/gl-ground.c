@@ -22,6 +22,7 @@ static GLuint ground_textures[1];
 
 int init_ground(void)
 {
+	return 1;
 }
 
 void draw_ground(void)

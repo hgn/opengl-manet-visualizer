@@ -74,6 +74,14 @@ struct node {
 	struct list_head list;
 };
 
+/* the next define defines the amount of time
+ * in seconds for how a active event (transmission
+ * of a packet) should be active. This is neccessary
+ * to display the event a little bit longer then
+ * 0.0001 seconds
+ */
+#define	EVENT_PERSISTENCE_TIME 0.25
+
 struct event {
 	double time;
 	uint32_t type;
@@ -107,6 +115,9 @@ void display(void);
 void special(int, int, int);
 void keyboard(unsigned char, int, int);
 
+/* node.c */
+int init_nodes(void);
+
 /* util.c */
 void *xalloc(size_t);
 void die(const char *);
@@ -133,6 +144,7 @@ void mouseMovement(int, int);
 
 /* event.c */
 void activate_event(struct list_head *, struct event *);
+struct event *peek_next_event(struct scenario *);
 
 
 

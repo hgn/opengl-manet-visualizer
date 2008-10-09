@@ -87,7 +87,7 @@ def configure(conf):
 
 def build(bld):
 
-	bld.add_subdirs('src data')
+	bld.add_subdirs('src')
 
 
 def cscope_gen():

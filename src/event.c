@@ -45,10 +45,20 @@ void activate_event(struct list_head *a_ev_l, struct event *event)
 	assert(a_ev_l && event);
 
 	active_events++;
-
 	list_add_tail(&(event->list), a_ev_l);
 }
 
+static int is_event_outdated(struct event *e)
+{
+	assert(e);
+
+	//fprintf(stderr, "e_time %lf curr %lf\n", e->time, simulator_time());
+
+	if (e->time + EVENT_PERSISTENCE_TIME < simulator_time())
+		return 1;
+	else
+		return 0;
+}
 
 /**
  * Iterate over the activated event list and display it
@@ -64,20 +74,25 @@ void activate_event(struct list_head *a_ev_l, struct event *event)
  */
 void cli_display_events(struct list_head *a_ev_l)
 {
-	struct list_head *iter;
+	struct list_head *iter, *tmp;
 	struct event *event_ptr;
-	double s_time;
 
 	assert(a_ev_l);
 
 	if (active_events == 0)
 		return;
 
-	fprintf(stderr, "active events %u\n", active_events);
-
-	__list_for_each(iter, a_ev_l) {
+	list_for_each_safe(iter, tmp, a_ev_l) {
 		event_ptr = list_entry(iter, struct event, list);
-		fprintf(stderr, " ...\n");
+
+		/* XXX: we display events here, it can be possible
+		 * that a event is already outdated. This code must
+		 * be split if there is some irregularities --HGN
+		 */
+
+		if (is_event_outdated(event_ptr)) {
+			list_del(&(event_ptr->list));
+		}
 	}
 }
 
@@ -123,7 +138,6 @@ void print_event_info(struct event *e)
 void add_event(struct scenario *s, double time, uint32_t type, void *data)
 {
 	struct event *e;
-	double tmp;
 
 	e =  xalloc(sizeof(struct event));
 

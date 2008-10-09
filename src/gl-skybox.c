@@ -36,27 +36,27 @@ int init_skybox(void)
 
 	/* load textures required textures */
 	image[0] = load_image("/usr/share/manet-visualizer/textures/skydome-02/xn.bmp", BMP_TYPE);
-	if (!image)
+	if (!image[0])
 		die("Can't load texture for skydome");
 
 	image[1] = load_image("/usr/share/manet-visualizer/textures/skydome-02/xp.bmp", BMP_TYPE);
-	if (!image)
+	if (!image[1])
 		die("Can't load texture for skydome");
 
 	image[2] = load_image("/usr/share/manet-visualizer/textures/skydome-02/yn.bmp", BMP_TYPE);
-	if (!image)
+	if (!image[2])
 		die("Can't load texture for skydome");
 
 	image[3] = load_image("/usr/share/manet-visualizer/textures/skydome-02/yp.bmp", BMP_TYPE);
-	if (!image)
+	if (!image[3])
 		die("Can't load texture for skydome");
 
 	image[4] = load_image("/usr/share/manet-visualizer/textures/skydome-02/zn.bmp", BMP_TYPE);
-	if (!image)
+	if (!image[4])
 		die("Can't load texture for skydome");
 
 	image[5] = load_image("/usr/share/manet-visualizer/textures/skydome-02/zp.bmp", BMP_TYPE);
-	if (!image)
+	if (!image[5])
 		die("Can't load texture for skydome");
 
 	glGenTextures(1, skydome_textures);

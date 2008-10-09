@@ -23,7 +23,10 @@
 
 int get_node_pos_by_time(uint32_t node_id, double search_time, int32_t *x, int32_t *y)
 {
-	struct node *node;
+
+	(void) node_id;
+
+	//struct node *node;
 	/* iterate through node list and fetch node */
 
 	/* iterate through position list and
@@ -31,7 +34,7 @@ int get_node_pos_by_time(uint32_t node_id, double search_time, int32_t *x, int32
 	 * as well as the corresponding coordinates
 	 */
 
-	struct coordinate *coordinate;
+	//struct coordinate *coordinate;
 
 	/* do the calculation for time search_time:
 	 *
@@ -47,7 +50,6 @@ int get_node_pos_by_time(uint32_t node_id, double search_time, int32_t *x, int32
 	 *  if t_next of t_prev IS search time we
 	 *  return instantly the right coordinates.
 	 */
-	int i;
 	int32_t w_next_x, w_prev_x;
 	int32_t w_next_y, w_prev_y;
 	double t_next, t_prev;
@@ -56,6 +58,8 @@ int get_node_pos_by_time(uint32_t node_id, double search_time, int32_t *x, int32
 
 	*x = ((w_next_x - w_prev_x) / ((t_next - t_prev) / t_t - t_prev)) + w_prev_x;
 	*y = ((w_next_y - w_prev_y) / ((t_next - t_prev) / t_t - t_prev)) + w_prev_y;
+
+	return 1;
 }
 
 struct node *alloc_node(uint32_t id)

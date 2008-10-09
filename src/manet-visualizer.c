@@ -18,14 +18,66 @@
 
 #include "global.h"
 #include <locale.h>
+#include <sys/utsname.h>
 
 struct scenario *scenario;
+static struct event *next_event = NULL;
+static struct list_head *a_ev_l;
+
+static void calc_scene(void)
+{
+
+	double s_time;
+
+	s_time = simulator_time();
+	next_event = peek_next_event(scenario);
+
+
+	while (next_event && s_time >= next_event->time) {
+
+		/* remove event from the global
+		 * event queue cause the event
+		 * is now processed in the active event list (a_ev_l)
+		 */
+		list_del(&next_event->list);
+
+		/* process all event in queue */
+		INIT_LIST_HEAD(&next_event->list);
+		activate_event(a_ev_l, next_event);
+
+		next_event = peek_next_event(scenario);
+	}
+
+	/* display all event that are active now
+	 * debug_display_nodes is also responsible to
+	 * remove outdatet elements
+	 */
+	cli_display_events(a_ev_l);
+
+	/* and display the positions of the nodes
+	 * at time s_time
+	 */
+	//debug_display_nodes_coordinates_at_time(scenario, s_time);
+}
+
+static void print_cli_teaser(void)
+{
+	struct utsname n;
+
+	uname(&n);
+
+	fprintf(stdout, "# Manet Visualizer (C) [%s, %s, %s, %s]\n",
+			n.nodename, n.release, n.version, n.machine);
+
+	fflush(stderr); fflush(stdout);
+}
 
 int main(int ac, char **av)
 {
-	struct list_head *a_ev_l;
 
 	setlocale(LC_ALL, "C");
+
+	print_cli_teaser();
 
 	scenario = parse_offline_scenario(TRACE_FILE_NS2, "/usr/share/manet-visualizer/traces/ns2-new-wireless.tr");
 	print_nodes_info(scenario);
@@ -43,55 +95,19 @@ int main(int ac, char **av)
 	glutDisplayFunc(display);
 	glutSpecialFunc(special);
 
+	glutIdleFunc(calc_scene);
+
 	/* user input handler */
 	glutKeyboardFunc(keyboard);
 	glutPassiveMotionFunc(mouseMovement);
 
-	/* initalize mv specific routines */
+	/* initalize gl specific routines */
 	init_skybox();
 	init_terrain();
 	init_nodes();
 	init_ground();
 
-	struct event *next_event = NULL;
-	next_event = peek_next_event(scenario);
-
 	while (23) {
-
-		double s_time;
-
-#if 0
-
-
-		s_time = simulator_time();
-
-		while (next_event && s_time >= next_event->time) {
-
-			/* process all event in queue */
-			activate_event(a_ev_l, next_event);
-
-			/* remove event from the global
-			 * event queue cause the event
-			 * is now processed in the active event list (a_ev_l)
-			 */
-			list_del(&next_event->list);
-
-			next_event = peek_next_event(scenario);
-		}
-
-		/* display all event that are active now
-		 * debug_display_nodes is also responsible to
-		 * remove outdatet elements
-		 */
-		cli_display_events(a_ev_l);
-
-#endif
-
-		/* and display the positions of the nodes
-		 * at time s_time
-		 */
-		//debug_display_nodes_coordinates_at_time(scenario, s_time);
-
 		glutMainLoop();
 	}
 

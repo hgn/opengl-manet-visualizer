@@ -94,7 +94,25 @@ static void drawText2(const char * message)
 	 * mapped via the modelview and projection matrices
 	 */
 	glColor4ub(0, 0, 0, 255);
-	glRasterPos2f((GLfloat)7, (GLfloat)30);
+	glRasterPos2f((GLfloat)7, (GLfloat)45);
+
+	/*
+	 * write using bitmap and stroke chars
+	 */
+	while (*message) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *message);
+		*message++;
+		//glutStrokeCharacter(GLUT_STROKE_ROMAN,*message++);
+	}
+}
+
+static void drawText3(const char * message)
+{
+	/* raster pos sets the current raster position
+	 * mapped via the modelview and projection matrices
+	 */
+	glColor4ub(0, 0, 0, 255);
+	glRasterPos2f((GLfloat)7, (GLfloat)31);
 
 	/*
 	 * write using bitmap and stroke chars
@@ -129,9 +147,12 @@ static void draw_menu(void) {
 #define MESSAGE	"MANET Network Visualizer"
 
 	char *msg = MESSAGE;
+	char s_time_str[64];
+	snprintf(s_time_str, sizeof(s_time_str), "Time: %.2lfs", simulator_time());
 
 	drawText(msg);
 	drawText2(s);
+	drawText3(s_time_str);
 
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
@@ -279,7 +300,7 @@ void display(void)
      time=glutGet(GLUT_ELAPSED_TIME);
      if (time - timebase > 1000) {
          sprintf(s,"FPS:%4.2f",frame*1000.0/(time-timebase));
-         timebase = time;        
+         timebase = time;
          frame = 0;
      }
 
