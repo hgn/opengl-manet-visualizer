@@ -28,7 +28,7 @@
 #define	NS2_TR_NODE_ID 8
 #define	NS2_TR_POS_X   10
 #define	NS2_TR_POS_Y   12
-#define	NS2_TR_PROTO_L 19
+#define	NS2_TR_PROTO_L 18
 
 
 int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
@@ -79,6 +79,8 @@ static enum event_type categorize_event(char *data[])
 	if (!data[NS2_TR_PROTO_L])
 		return ET_UNKNOWN;
 
+	fprintf(stderr, "not (%s)\n", data[NS2_TR_PROTO_L]);
+
 	if (!strcmp(data[NS2_TR_PROTO_L], "AGT")) {
 		return ET_CBR_IN;
 	} else {
@@ -88,9 +90,18 @@ static enum event_type categorize_event(char *data[])
 
 #define	DATA_IN 1
 
-static void entail_cbr_in(struct scenario *s, char *time)
+/* entail_cbr_in is the last interface between the trace file
+ * independent event handling. entail_cbr_in() will convert
+ * the values into natives one and enqueue the data to the event
+ * handling routines.
+ */
+static void entail_cbr_in(struct scenario *s, char *s_time)
 {
-	add_event(s, time, DATA_IN, NULL);
+	double d_time;
+
+	d_time = xstrtod(s_time);
+
+	add_event(s, d_time, DATA_IN, NULL);
 }
 
 

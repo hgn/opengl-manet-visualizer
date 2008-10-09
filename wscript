@@ -1,5 +1,9 @@
 #! /usr/bin/env python
 
+# waf imports
+import Common, Params, misc
+
+
 VERSION='0.0.1'
 APPNAME='manet-visualizer'
 
@@ -11,8 +15,11 @@ blddir = 'build'
 g_excludes = '.git .hg'.split()
 
 def set_options(opt):
-	#opt.tool_options('compiler_c')
-	pass
+  opt.add_option('--cscope',
+                   help=('generate an cscope index - ready to use with vim/emacs'),
+                   action="store_true", default=False,
+                   dest='cscope_gen')
+
 
 def configure(conf):
 
@@ -22,11 +29,11 @@ def configure(conf):
 
   #conf.sub_config('src')
 
-  conf.env['CXXFLAGS_MYPROG']='-O3 -pipe'
+  conf.env['CFLAGS_MYPROG']='-O3 -pipe'
 
   conf.env['INSTALL_DIR']='/usr/bin'
 
-  conf.env['CXXFLAGS'] = '-D_REENTRANT -DDBG_ENABLED -Wall -W -O0 -ggdb3 -ftemplate-depth-128'
+  conf.env['CFLAGS'] = '-D_REENTRANT -DDBG_ENABLED -Wall -W -O0 -ggdb3 -ftemplate-depth-128'
 
   conf.env['LIB_M'] = 'm'
 
@@ -80,7 +87,13 @@ def configure(conf):
 
 def build(bld):
 
-	bld.add_subdirs('src')
+	bld.add_subdirs('src data')
+
+
+def cscope_gen():
+
+  if subprocess.Popen(['cscope', '-R', '-b']).wait():
+    raise SystemExit(1)
 
 
 def shutdown():

@@ -110,6 +110,11 @@ void keyboard(unsigned char, int, int);
 /* util.c */
 void *xalloc(size_t);
 void die(const char *);
+inline double xstrtod(const char *);
+
+/* time.c */
+double simulator_time(void);
+void setup_simulator_ref_time(void);
 
 /* texture.c */
 struct image *load_image(char *, enum image_file_type);
@@ -126,6 +131,8 @@ void draw_ground(void);
 /* mouse.c */
 void mouseMovement(int, int);
 
+/* event.c */
+void activate_event(struct list_head *, struct event *);
 
 
 
@@ -138,7 +145,7 @@ int get_node_pos_by_time(uint32_t, double, int32_t *, int32_t *);
 
 void print_event_info(struct event *);
 struct list_head *init_active_event_list(void);
-void debug_display_events(struct list_head *);
+void cli_display_events(struct list_head *);
 
 /* scenario.c */
 struct scenario *alloc_scenario(void);

@@ -54,7 +54,6 @@ void print_nodes_info(struct scenario *s)
 		node_ptr = list_entry(iter, struct node, list);
 		print_node_info(node_ptr);
 	}
-
 }
 
 void debug_display_nodes_coordinates_at_time(struct scenario *s, double s_time)

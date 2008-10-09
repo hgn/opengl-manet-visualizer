@@ -35,6 +35,8 @@ struct list_head *init_active_event_list(void)
 	return l;
 }
 
+uint32_t active_events;
+
 /**
  * Enqueue event to the active list
  */
@@ -42,7 +44,9 @@ void activate_event(struct list_head *a_ev_l, struct event *event)
 {
 	assert(a_ev_l && event);
 
-	list_add_tail(&event->list, a_ev_l);
+	active_events++;
+
+	list_add_tail(&(event->list), a_ev_l);
 }
 
 
@@ -58,8 +62,23 @@ void activate_event(struct list_head *a_ev_l, struct event *event)
  * accelerations rate -> EVENT_PERSISTENCE_TIME is always
  * realtime.
  */
-void debug_display_events(struct list_head *a_ev_l)
+void cli_display_events(struct list_head *a_ev_l)
 {
+	struct list_head *iter;
+	struct event *event_ptr;
+	double s_time;
+
+	assert(a_ev_l);
+
+	if (active_events == 0)
+		return;
+
+	fprintf(stderr, "active events %u\n", active_events);
+
+	__list_for_each(iter, a_ev_l) {
+		event_ptr = list_entry(iter, struct event, list);
+		fprintf(stderr, " ...\n");
+	}
 }
 
 
@@ -75,16 +94,12 @@ struct event *peek_next_event(struct scenario *sc)
 
 	assert(sc);
 
-#if 0
 	if (sc->events_in_queue == 0)
 		return NULL;
-#endif
 
 	sc->events_in_queue--;
 
-	fprintf(stderr, "event in queue: %u\n", sc->events_in_queue);
-
-	ev = list_first_entry(&sc->event_list, struct event, list);
+	ev = list_last_entry(&sc->event_list, struct event, list);
 	if (!ev)
 		return NULL;
 
@@ -108,6 +123,7 @@ void print_event_info(struct event *e)
 void add_event(struct scenario *s, double time, uint32_t type, void *data)
 {
 	struct event *e;
+	double tmp;
 
 	e =  xalloc(sizeof(struct event));
 

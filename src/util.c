@@ -44,4 +44,17 @@ void *xalloc(size_t size)
 	return ptr;
 }
 
+inline double xstrtod(const char *c_digit)
+{
+	double ret;
+	char *endptr;
+
+	errno = 0;
+	ret = strtod(c_digit, &endptr);
+	if (*endptr != '\0' || errno != 0)
+		return 0.0;
+
+	return ret;
+}
+
 /* vim: set tw=78 ts=4 sw=4 sts=4 ff=unix noet: */

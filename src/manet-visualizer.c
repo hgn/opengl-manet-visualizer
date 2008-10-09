@@ -53,40 +53,44 @@ int main(int ac, char **av)
 	init_nodes();
 	init_ground();
 
+	struct event *next_event = NULL;
+	next_event = peek_next_event(scenario);
+
 	while (23) {
 
 		double s_time;
-		struct event *next_event = NULL;
+
+#if 0
 
 
 		s_time = simulator_time();
-		next_event = peek_next_event();
 
 		while (next_event && s_time >= next_event->time) {
+
+			/* process all event in queue */
+			activate_event(a_ev_l, next_event);
 
 			/* remove event from the global
 			 * event queue cause the event
 			 * is now processed in the active event list (a_ev_l)
 			 */
-			//list_del(&next_event->list);
+			list_del(&next_event->list);
 
-			/* process all event in queue */
-			//activate_event(next_event, a_ev_l);
-			//next_event = peek_next_event();
+			next_event = peek_next_event(scenario);
 		}
 
 		/* display all event that are active now
 		 * debug_display_nodes is also responsible to
 		 * remove outdatet elements
 		 */
-		//debug_display_events(a_ev_l);
+		cli_display_events(a_ev_l);
+
+#endif
 
 		/* and display the positions of the nodes
 		 * at time s_time
 		 */
 		//debug_display_nodes_coordinates_at_time(scenario, s_time);
-
-
 
 		glutMainLoop();
 	}

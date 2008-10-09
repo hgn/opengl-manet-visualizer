@@ -22,6 +22,10 @@
 
 struct timeval reference_time;
 
+/**
+ * setup_simulator_ref_time() intialize
+ * the reference time for the simulator
+ */
 void setup_simulator_ref_time(void)
 {
 	gettimeofday(&reference_time, NULL);
@@ -36,8 +40,9 @@ double simulator_time(void)
 
 	gettimeofday(&current_time, NULL);
 
-	ret = (((double)reference_time.tv_sec - current_time.tv_sec) * 1000000000) +
-		((double)reference_time.tv_usec - current_time.tv_usec);
+	ret = (((double)current_time.tv_sec - reference_time.tv_sec)) +
+		(((double)current_time.tv_usec - reference_time.tv_usec) / 1000000);
+
 
 	return ret;
 }
