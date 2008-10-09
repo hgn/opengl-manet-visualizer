@@ -54,6 +54,22 @@ int init_nodes(void)
 	return 1;
 }
 
+static void draw_node_at_pos(struct node *node, int32_t x, int32_t y)
+{
+	GLUquadricObj *cyl;
+	cyl = gluNewQuadric();
+
+
+	glPushMatrix();
+
+	glColor3f( 0.0f, 0.0f, 1.0f );
+	glTranslatef((float)x/10, -1.0f, (float)y/10);
+	gluQuadricDrawStyle(cyl, GLU_LINE);
+	draw_nodes();
+
+	glPopMatrix();
+}
+
 void map_draw_nodes(void)
 {
 	/* iterate over all nodes */
@@ -71,7 +87,7 @@ void map_draw_nodes(void)
 	__list_for_each(iter, &(scenario->node_list)) {
 		node_ptr = list_entry(iter, struct node, list);
 		get_node_pos_by_time(node_ptr, s_time, &x, &y);
-		fprintf(stderr, "node %d [x:%d,y:%d]\n", node_ptr->id, x, y);
+		draw_node_at_pos(node_ptr, x, y);
 	}
 }
 

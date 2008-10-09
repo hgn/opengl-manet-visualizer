@@ -97,6 +97,7 @@ int init_terrain(void)
 	glEndList();
 
 
+#if 0
 
 	int x, y, n, a, b;
 
@@ -119,7 +120,6 @@ int init_terrain(void)
         }
     }
 
-#if 0
 
     // Smooth terrain (reduce jaggedness)
 	for(n = 0; n<2; n++){
@@ -136,7 +136,6 @@ int init_terrain(void)
 		}
 	}
 
-#endif
 
 	terrain_outer_list = glGenLists(1);
 	glNewList(terrain_outer_list, GL_COMPILE);
@@ -160,6 +159,7 @@ int init_terrain(void)
 
 	free(terrain);
 
+#endif
 
 
 	return 1;
