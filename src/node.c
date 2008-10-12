@@ -31,6 +31,7 @@ int get_node_pos_by_time(struct node *node, double search_time, int32_t *x, int3
 	int32_t w_next_x, w_prev_x;
 	int32_t w_next_y, w_prev_y;
 	double t_next, t_prev;
+	double s_time;
 
 	memset(&null_position, 0, sizeof(struct position));
 
@@ -44,10 +45,11 @@ int get_node_pos_by_time(struct node *node, double search_time, int32_t *x, int3
 	co_prev = co_next = &null_position;
 
 
-	__list_for_each(iter, &(node->position_list)) {
+
+	__list_for_each_prev(iter, &(node->position_list)) {
 		coordinate = list_entry(iter, struct position, list);
 		co_next = coordinate;
-		if (co_next->time >= search_time)
+		if (co_next->time - s_time >= search_time)
 			break;
 		co_prev = co_next;
 	}
@@ -77,6 +79,10 @@ int get_node_pos_by_time(struct node *node, double search_time, int32_t *x, int3
 
 	*x = ((w_next_x - w_prev_x) / ((t_next - t_prev) / t_t - t_prev)) + w_prev_x;
 	*y = ((w_next_y - w_prev_y) / ((t_next - t_prev) / t_t - t_prev)) + w_prev_y;
+
+	if (node->id == 8) {
+		fprintf(stderr, "x: %d y: %d (%d:%d)\n", *x, *y, w_prev_x, w_prev_y);
+	}
 
 	return 1;
 }

@@ -212,6 +212,7 @@ void display(void)
 #endif
 
 	/* red lines - grid */
+#if 0
 	glBegin(GL_LINES);
 	glLineWidth(1.0);
 	glNormal3f(1.0f, 0.0f, 0.0f);
@@ -228,6 +229,7 @@ void display(void)
 	}
 	}
 	glEnd();		// done with the polygon.
+#endif
 
 
 	map_draw_nodes();

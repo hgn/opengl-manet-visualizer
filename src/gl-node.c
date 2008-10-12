@@ -54,33 +54,74 @@ int init_nodes(void)
 	return 1;
 }
 
+static void draw_nodes(void)
+{
+	int l_index;
+
+	glBegin(GL_TRIANGLES);
+
+	for (l_index = 0; l_index < object.polygons_qty; l_index++) {
+
+		float vert1[3],vert2[3],vert3[3];
+
+		vert1[0] = object.vertex[ object.polygon[l_index].a ].x;
+		vert1[1] = object.vertex[ object.polygon[l_index].a ].y;
+		vert1[2] = object.vertex[ object.polygon[l_index].a ].z;
+
+		vert2[0] = object.vertex[ object.polygon[l_index].b ].x;
+		vert2[1] = object.vertex[ object.polygon[l_index].b ].y;
+		vert2[2] = object.vertex[ object.polygon[l_index].b ].z;
+
+		vert3[0] = object.vertex[ object.polygon[l_index].c ].x;
+		vert3[1] = object.vertex[ object.polygon[l_index].c ].y;
+		vert3[2] = object.vertex[ object.polygon[l_index].c ].z;
+
+		calculateNormal(vert1,vert2,vert3);
+
+		glVertex3f( object.vertex[ object.polygon[l_index].a ].x/10,
+				object.vertex[ object.polygon[l_index].a ].y/10,
+				object.vertex[ object.polygon[l_index].a ].z/10);
+
+		glVertex3f( object.vertex[ object.polygon[l_index].b ].x/10,
+				object.vertex[ object.polygon[l_index].b ].y/10,
+				object.vertex[ object.polygon[l_index].b ].z/10);
+
+		glVertex3f( object.vertex[ object.polygon[l_index].c ].x/10,
+				object.vertex[ object.polygon[l_index].c ].y/10,
+				object.vertex[ object.polygon[l_index].c ].z/10);
+	}
+	glEnd();
+}
+
+
+#define	NODE_MOTION_SCALE_FACTOR 20
+
 static void draw_node_at_pos(struct node *node, int32_t x, int32_t y)
 {
 	GLUquadricObj *cyl;
 	cyl = gluNewQuadric();
 
-
 	glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	/* node itself */
 	glPushMatrix();
-
 	glColor3f( 0.0f, 0.0f, 1.0f );
-	glTranslatef((float)x/10, -1.0f, (float)y/10);
+	glTranslatef((float)x/NODE_MOTION_SCALE_FACTOR, -1.0f, (float)y/NODE_MOTION_SCALE_FACTOR);
 	gluQuadricDrawStyle(cyl, GLU_LINE);
 	draw_nodes();
-
 	glPopMatrix();
 
+	/* and transmission range */
 	glPushMatrix();
 	glColor4f( 0.0f, 0.0f, 1.0f, 0.4f);
 	glRotatef(90., 1., 0., 0.);
-	glTranslatef((float)x/10, (float)y/10, .9f);	// move z units out from the screen.
+	glTranslatef((float)x/NODE_MOTION_SCALE_FACTOR, (float)y/NODE_MOTION_SCALE_FACTOR, .9f);
 	GLUquadricObj *quadratic1;
 	quadratic1=gluNewQuadric();			// Create A Pointer To The Quadric Object ( NEW )
 	gluQuadricNormals(quadratic1, GLU_SMOOTH);	// Create Smooth Normals ( NEW )
 	gluQuadricTexture(quadratic1, GL_TRUE);		// Create Texture Coords ( NEW )
-	gluDisk(quadratic1,0.2f,2.5f,32,32);
+	gluDisk(quadratic1,0.2f,7.0f,32,32);
 	glPopMatrix();
 }
 
@@ -104,62 +145,6 @@ void map_draw_nodes(void)
 		draw_node_at_pos(node_ptr, x, y);
 	}
 }
-
-
-void draw_nodes(void)
-{
-	int l_index;
-
-	glBegin(GL_TRIANGLES); // glBegin and glEnd delimit the vertices that define a primitive (in our case triangles)
-	for (l_index=0;l_index<object.polygons_qty;l_index++)
-	{
-		//prepare tp calculate lighting normals
-		float vert1[3],vert2[3],vert3[3];
-
-		vert1[0] = object.vertex[ object.polygon[l_index].a ].x;
-		vert1[1] = object.vertex[ object.polygon[l_index].a ].y;
-		vert1[2] = object.vertex[ object.polygon[l_index].a ].z;
-
-		vert2[0] = object.vertex[ object.polygon[l_index].b ].x;
-		vert2[1] = object.vertex[ object.polygon[l_index].b ].y;
-		vert2[2] = object.vertex[ object.polygon[l_index].b ].z;
-
-		vert3[0] = object.vertex[ object.polygon[l_index].c ].x;
-		vert3[1] = object.vertex[ object.polygon[l_index].c ].y;
-		vert3[2] = object.vertex[ object.polygon[l_index].c ].z;
-
-		calculateNormal(vert1,vert2,vert3);
-
-		//----------------- FIRST VERTEX -----------------
-		// Texture coordinates of the first vertex
-		//glTexCoord2f( object.mapcoord[ object.polygon[l_index].a ].u,
-		//              object.mapcoord[ object.polygon[l_index].a ].v);
-		// Coordinates of the first vertex
-		glVertex3f( object.vertex[ object.polygon[l_index].a ].x/10,
-				object.vertex[ object.polygon[l_index].a ].y/10,
-				object.vertex[ object.polygon[l_index].a ].z/10); //Vertex definition
-
-		//----------------- SECOND VERTEX -----------------
-		// Texture coordinates of the second vertex
-		// glTexCoord2f( object.mapcoord[ object.polygon[l_index].b ].u,
-		//              object.mapcoord[ object.polygon[l_index].b ].v);
-		// Coordinates of the second vertex
-		glVertex3f( object.vertex[ object.polygon[l_index].b ].x/10,
-				object.vertex[ object.polygon[l_index].b ].y/10,
-				object.vertex[ object.polygon[l_index].b ].z/10);
-
-		//----------------- THIRD VERTEX -----------------
-		// Texture coordinates of the third vertex
-		// glTexCoord2f( object.mapcoord[ object.polygon[l_index].c ].u,
-		//              object.mapcoord[ object.polygon[l_index].c ].v);
-		// Coordinates of the Third vertex
-		glVertex3f( object.vertex[ object.polygon[l_index].c ].x/10,
-				object.vertex[ object.polygon[l_index].c ].y/10,
-				object.vertex[ object.polygon[l_index].c ].z/10);
-	}
-	glEnd();
-}
-
 
 
 /* vim: set tw=78 ts=4 sw=4 sts=4 ff=unix noet: */
