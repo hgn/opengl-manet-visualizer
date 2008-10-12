@@ -48,14 +48,14 @@ void debug_display_nodes_coordinates_at_time(struct scenario *s, double s_time)
 {
 	struct list_head *iter;
 	struct node *node_ptr;
-	int32_t x, y;
+	float x, y;
 
 	assert(s);
 
 	__list_for_each(iter, &(s->node_list)) {
 		node_ptr = list_entry(iter, struct node, list);
 		get_node_pos_by_time(node_ptr->id, s_time, &x, &y);
-		fprintf(stdout, "node %u [x: %d y:%d]\n", node_ptr->id, x, y);
+		fprintf(stdout, "node %u [x: %f y:%f]\n", node_ptr->id, x, y);
 	}
 
 }

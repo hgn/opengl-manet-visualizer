@@ -47,7 +47,7 @@ static void calculateNormal( float *coord1, float *coord2, float *coord3 )
 	glNormal3f( vr[0]/val, vr[1]/val, vr[2]/val );
 }
 
-int init_nodes(void)
+int init_gl_nodes(void)
 {
 	load_model_3ds(&object, "/usr/share/manet-visualizer/3d-models/misc/sphere.3ds");
 
@@ -96,33 +96,53 @@ static void draw_nodes(void)
 
 #define	NODE_MOTION_SCALE_FACTOR 20
 
-static void draw_node_at_pos(struct node *node, int32_t x, int32_t y)
+static void draw_node_at_pos(struct node *node, float x, float y)
 {
+	int i;
+
 	GLUquadricObj *cyl;
 	cyl = gluNewQuadric();
 
-	glEnable(GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	/* node itself */
+	/* transmission range */
+	glDisable(GL_DEPTH_TEST );
+	glDisable(GL_LIGHT0 );
+	glDisable(GL_LIGHTING );
+	glDisable(GL_COLOR_MATERIAL );
 	glPushMatrix();
-	glColor3f( 0.0f, 0.0f, 1.0f );
-	glTranslatef((float)x/NODE_MOTION_SCALE_FACTOR, -1.0f, (float)y/NODE_MOTION_SCALE_FACTOR);
-	gluQuadricDrawStyle(cyl, GLU_LINE);
-	draw_nodes();
-	glPopMatrix();
-
-	/* and transmission range */
-	glPushMatrix();
-	glColor4f( 0.0f, 0.0f, 1.0f, 0.4f);
+	glColor4f(node->color[0], node->color[1], node->color[2], 0.4f);
 	glRotatef(90., 1., 0., 0.);
-	glTranslatef((float)x/NODE_MOTION_SCALE_FACTOR, (float)y/NODE_MOTION_SCALE_FACTOR, .9f);
+	glTranslatef(x / NODE_MOTION_SCALE_FACTOR, y / NODE_MOTION_SCALE_FACTOR, .9f);
 	GLUquadricObj *quadratic1;
 	quadratic1=gluNewQuadric();			// Create A Pointer To The Quadric Object ( NEW )
 	gluQuadricNormals(quadratic1, GLU_SMOOTH);	// Create Smooth Normals ( NEW )
 	gluQuadricTexture(quadratic1, GL_TRUE);		// Create Texture Coords ( NEW )
 	gluDisk(quadratic1,0.2f,7.0f,32,32);
 	glPopMatrix();
+
+	glEnable(GL_BLEND);
+	glEnable( GL_COLOR_MATERIAL );
+	glEnable( GL_LIGHTING );
+	glEnable( GL_LIGHT0 );
+	glEnable( GL_DEPTH_TEST );
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor3f(node->color[0], node->color[1], node->color[2]);
+
+	/* node itself */
+	glPushMatrix();
+
+	glTranslatef(x / NODE_MOTION_SCALE_FACTOR, -1.0f, y / NODE_MOTION_SCALE_FACTOR);
+	gluQuadricDrawStyle(cyl, GLU_LINE);
+	draw_nodes();
+	glPopMatrix();
+
+	/* and node info */
+	glDisable(GL_DEPTH_TEST );
+	glDisable(GL_LIGHT0 );
+	glDisable(GL_LIGHTING );
+	glDisable(GL_COLOR_MATERIAL );
+	glColor4f( 1.0f, 1.0f, 0.0f, 1.0f);
+	render_node_info_string(node->name, x / NODE_MOTION_SCALE_FACTOR, 0.5f, y / NODE_MOTION_SCALE_FACTOR);
 }
 
 void map_draw_nodes(void)
@@ -131,13 +151,13 @@ void map_draw_nodes(void)
 	struct list_head *iter;
 	struct node *node_ptr;
 	double s_time;
-	int32_t x, y;
+	float x, y;
 
 	assert(scenario);
 
 	s_time = simulator_time();
 
-	x = y = 0;
+	x = y = 0.0;
 
 	__list_for_each(iter, &(scenario->node_list)) {
 		node_ptr = list_entry(iter, struct node, list);

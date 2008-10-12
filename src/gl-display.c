@@ -53,9 +53,6 @@ void reshape(int w, int h)
 
 static void render( float camera_yaw, float camera_pitch )
 {
-	draw_skybox(camera_yaw, camera_pitch);
-	draw_ground();
-	draw_terrain();
 }
 
 float lastx, lasty;
@@ -160,17 +157,6 @@ static void draw_menu(void) {
 	glPopMatrix();
 }
 
-static void renderBitmapString( float x, float y, float z, char *string)
-{
-	char *c;
-
-	glRasterPos3f(x, y, z);
-
-	for (c=string; *c != '\0'; c++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, *c);
-	}
-}
-
 
 void display(void)
 {
@@ -186,12 +172,15 @@ void display(void)
 	glLoadIdentity();
 	glColor3f( 1.0f, 1.0f, 1.0f );
 
-	glRotatef(xrot,1.0,0.0,0.0);
-	glRotatef(yrot,0.0,1.0,0.0);
-	glTranslated(-xpos,-ypos,-zpos);
+	glRotatef(xrot, 1.0, 0.0, 0.0);
+	glRotatef(yrot, 0.0, 1.0, 0.0);
+	glTranslated(-xpos, -ypos, -zpos);
 
-	render(yrot, xrot);
+	draw_skybox(yrot, xrot);
+	draw_ground();
+	draw_terrain();
 
+#if 0
 	glPushMatrix();
 	glColor3f( 1.0f, 1.0f, 0.0f );
 	glRotatef(90., 1., 0., 0.);
@@ -199,7 +188,6 @@ void display(void)
 	draw_nodes();
 	glPopMatrix();
 
-#if 0
 	glBegin(GL_QUADS);	// begin drawing a cube
 	// Surface
 	glNormal3f(0.0f, 0.0f, 0.0f);
@@ -232,6 +220,10 @@ void display(void)
 #endif
 
 
+	/* draw all nodes, this includes
+	 *  o node illustration
+	 *  o node infotext
+	 */
 	map_draw_nodes();
 
 
@@ -241,6 +233,8 @@ void display(void)
 
 	glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+#if 0
 
 	/* cylinder */
 	glPushMatrix();
@@ -264,8 +258,6 @@ void display(void)
 
 	glPopMatrix();
 
-	glColor4f( 1.0f, 1.0f, 0.0f, 1.0f);
-	renderBitmapString(0.0f, 0.5f, 0.0f, "Node 1");
 
 
 
@@ -289,8 +281,10 @@ void display(void)
 	gluDisk(quadratic1,0.2f,2.5f,32,32);
 	glPopMatrix();
 
+#endif
+
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	renderBitmapString(2.0f, 0.5f, 0.0f, "Node 2");
+	render_node_info_string("node 2", 2.0f, 0.5f, 0.0f);
 
 	glDisable(GL_DEPTH_TEST );
 	glDisable(GL_LIGHT0 );

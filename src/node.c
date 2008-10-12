@@ -22,7 +22,7 @@
 #include <assert.h>
 
 
-int get_node_pos_by_time(struct node *node, double search_time, int32_t *x, int32_t *y)
+int get_node_pos_by_time(struct node *node, double search_time, float *x, float *y)
 {
 	struct list_head *iter;
 	struct position *coordinate;
@@ -31,7 +31,6 @@ int get_node_pos_by_time(struct node *node, double search_time, int32_t *x, int3
 	int32_t w_next_x, w_prev_x;
 	int32_t w_next_y, w_prev_y;
 	double t_next, t_prev;
-	double s_time;
 
 	memset(&null_position, 0, sizeof(struct position));
 
@@ -49,7 +48,7 @@ int get_node_pos_by_time(struct node *node, double search_time, int32_t *x, int3
 	__list_for_each_prev(iter, &(node->position_list)) {
 		coordinate = list_entry(iter, struct position, list);
 		co_next = coordinate;
-		if (co_next->time - s_time >= search_time)
+		if (co_next->time >= search_time)
 			break;
 		co_prev = co_next;
 	}
@@ -77,12 +76,8 @@ int get_node_pos_by_time(struct node *node, double search_time, int32_t *x, int3
 
 	double t_t = search_time;
 
-	*x = ((w_next_x - w_prev_x) / ((t_next - t_prev) / t_t - t_prev)) + w_prev_x;
-	*y = ((w_next_y - w_prev_y) / ((t_next - t_prev) / t_t - t_prev)) + w_prev_y;
-
-	if (node->id == 8) {
-		fprintf(stderr, "x: %d y: %d (%d:%d)\n", *x, *y, w_prev_x, w_prev_y);
-	}
+	*x = (((float)w_next_x - w_prev_x) / (((float)t_next - t_prev) / t_t - t_prev)) + w_prev_x;
+	*y = (((float)w_next_y - w_prev_y) / (((float)t_next - t_prev) / t_t - t_prev)) + w_prev_y;
 
 	return 1;
 }
@@ -102,6 +97,30 @@ struct node *alloc_node(uint32_t id)
 	INIT_LIST_HEAD(&n->position_list);
 
 	return n;
+}
+
+static void assign_node_color(struct node *n)
+{
+	int i;
+
+	assert(n);
+
+	for (i = 0; i < 3; i++) {
+		n->color[i] = drand48();
+	}
+}
+
+void init_nodes(struct scenario *s) {
+
+	struct list_head *iter;
+	struct node *node_ptr;
+
+	assert(s);
+
+	__list_for_each(iter, &(s->node_list)) {
+		node_ptr = list_entry(iter, struct node, list);
+		assign_node_color(node_ptr);
+	}
 }
 
 

@@ -67,6 +67,7 @@ struct position {
 struct node {
 	uint32_t id;
 	char *name;
+	float color[3];
 
 	uint32_t position_data_entries;
 	struct list_head position_list;
@@ -115,10 +116,6 @@ void display(void);
 void special(int, int, int);
 void keyboard(unsigned char, int, int);
 
-/* gl_node.c */
-int init_nodes(void);
-void map_draw_nodes(void);
-
 /* util.c */
 void *xalloc(size_t);
 void die(const char *);
@@ -154,7 +151,7 @@ struct event *peek_next_event(struct scenario *);
 struct scenario *parse_offline_scenario(int, const char *);
 void print_trace_file_info(struct scenario *);
 
-int get_node_pos_by_time(struct node *, double, int32_t *, int32_t *);
+int get_node_pos_by_time(struct node *, double, float *, float *);
 
 void print_event_info(struct event *);
 struct list_head *init_active_event_list(void);
@@ -168,6 +165,13 @@ void print_nodes_info(struct scenario *);
 
 /* node.c */
 void print_node_info(struct node *);
+void init_nodes(struct scenario *);
+
+/* gl-nodes.c */
+int init_gl_nodes(void);
+
+/* gl-text.c */
+void render_node_info_string(char *, float, float, float);
 
 
 
