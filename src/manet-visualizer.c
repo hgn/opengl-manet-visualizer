@@ -21,8 +21,8 @@
 #include <sys/utsname.h>
 
 struct scenario *scenario;
+struct list_head *a_ev_l;
 static struct event *next_event = NULL;
-static struct list_head *a_ev_l;
 
 static void calc_scene(void)
 {
@@ -53,11 +53,6 @@ static void calc_scene(void)
 	 * remove outdatet elements
 	 */
 	cli_display_events(a_ev_l);
-
-	/* and display the positions of the nodes
-	 * at time s_time
-	 */
-	//debug_display_nodes_coordinates_at_time(scenario, s_time);
 }
 
 static void print_cli_teaser(void)
@@ -72,6 +67,8 @@ static void print_cli_teaser(void)
 	fflush(stderr); fflush(stdout);
 }
 
+#define	DEFAULT_PARSER_FILE "/usr/share/manet-visualizer/traces/ns2-new-wireless.tr"
+
 int main(int ac, char **av)
 {
 
@@ -79,7 +76,12 @@ int main(int ac, char **av)
 
 	print_cli_teaser();
 
-	scenario = parse_offline_scenario(TRACE_FILE_NS2, "/usr/share/manet-visualizer/traces/ns2-new-wireless.tr");
+	scenario = parse_offline_scenario(TRACE_FILE_NS2, DEFAULT_PARSER_FILE);
+	if (!scenario) {
+		fprintf(stderr, "Failure in parsing process of file %s, exiting\n",
+				DEFAULT_PARSER_FILE);
+		exit(EXIT_FAILURE);
+	}
 
 	/* we got all information about node (quantity, position, et cetera)
 	 * we now calculate some derived information like node color */

@@ -23,13 +23,13 @@
 #include <assert.h>
 
 
-#define	NS2_TR_EV_TYPE 0
-#define	NS2_TR_TIME    2
-#define	NS2_TR_NODE_ID 8
-#define	NS2_TR_POS_X   10
-#define	NS2_TR_POS_Y   12
-#define	NS2_TR_PROTO_L 18
-
+#define	NS2_TR_EV_TYPE     0
+#define	NS2_TR_TIME        2
+#define	NS2_TR_NODE_ID     8
+#define	NS2_TR_POS_X      10
+#define	NS2_TR_POS_Y      12
+#define	NS2_TR_PROTO_L    18
+#define	NS2_TR_PROTO_OLSR 34
 
 static int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
 {
@@ -44,11 +44,6 @@ static int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
 	if (!data[NS2_TR_TIME] || !data[NS2_TR_NODE_ID] || !data[NS2_TR_POS_X] || !data[NS2_TR_POS_Y])
 		return 0;
 
-	/*
-	fprintf(stderr, "time %s id %s x %s y %s\n",
-			data[TIME], data[NODE_ID], data[POS_X], data[POS_Y]);
-			*/
-
 	mtime   = strtod(data[NS2_TR_TIME], NULL);
 	nodeid = atoi(data[NS2_TR_NODE_ID]);
 	x      = atoi(data[NS2_TR_POS_X]);
@@ -56,7 +51,6 @@ static int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
 
 	node = get_node_by_id(s, nodeid);
 	if (!node) {
-		fprintf(stderr, "new node %d detected\n", nodeid);
 		node = alloc_node(nodeid);
 		add_node_to_scenario(s, node);
 	}
@@ -80,29 +74,78 @@ static enum event_type packet_type(char *data[])
 	if (!data[NS2_TR_PROTO_L])
 		return ET_UNKNOWN;
 
-	fprintf(stderr, "not (%s)\n", data[NS2_TR_PROTO_L]);
 
-	if (!strcmp(data[NS2_TR_PROTO_L], "AGT")) {
-		return ET_CBR_IN;
+	if (!strcmp(data[NS2_TR_PROTO_L], "AGT") &&
+			!strcmp(data[NS2_TR_EV_TYPE], "r")) {
+		return ET_PACKET_CBR;
+	} else if (!strcmp(data[NS2_TR_PROTO_OLSR], "UM-OLSR") &&
+			!strcmp(data[NS2_TR_EV_TYPE], "r")) {
+		return ET_PACKET_OLSR;
 	} else {
 		return ET_UNKNOWN;
 	}
 }
-
-#define	DATA_IN 1
 
 /* entail_cbr_in is the last interface between the trace file
  * independent event handling. entail_cbr_in() will convert
  * the values into natives one and enqueue the data to the event
  * handling routines.
  */
-static void entail_cbr_in(struct scenario *s, char *s_time)
+static void enqueue_event(struct scenario *s, char *s_time, uint32_t type, void *data)
 {
-	double d_time;
+	assert(s_time);
+	assert(type > 0);
 
-	d_time = xstrtod(s_time);
+	add_event(s, xstrtod(s_time), type, data);
+}
 
-	add_event(s, d_time, DATA_IN, NULL);
+#define	POS_NS2_MAC_SRC 30
+#define	POS_NS2_MAC_DST 32
+#define	POS_NS2_SIZE    36
+
+/**
+ * map data from char ** (trace line) to the container
+ * format. map_cbr_data return 1 for success and 0 in
+ * a error condition (format does not match the expection)
+ */
+static int map_cbr_data(void *p, char *d[])
+{
+	struct packet_cbr *cp;
+
+	assert(p);
+
+	if (!d[POS_NS2_MAC_SRC] || !d[POS_NS2_MAC_DST] || !d[POS_NS2_SIZE]) {
+		fprintf(stderr, "trace file seems to be corrupted\n");
+		return 0;
+	}
+
+	cp = (struct packet_cbr *)p;
+
+	cp->src       = atoi(d[POS_NS2_MAC_SRC]);
+	cp->dst       = atoi(d[POS_NS2_MAC_DST]);
+	cp->data_size = atoi(d[POS_NS2_SIZE]);
+
+	return 1;
+}
+
+static int map_olsr_data(void *p, char *d[])
+{
+	struct packet_olsr *cp;
+
+	assert(p);
+
+	if (!d[POS_NS2_MAC_SRC] || !d[POS_NS2_MAC_DST] || !d[POS_NS2_SIZE]) {
+		fprintf(stderr, "trace file seems to be corrupted\n");
+		return 0;
+	}
+
+	cp = (struct packet_olsr *)p;
+
+	cp->src       = atoi(d[POS_NS2_MAC_SRC]);
+	cp->dst       = atoi(d[POS_NS2_MAC_DST]);
+	cp->data_size = atoi(d[POS_NS2_SIZE]);
+
+	return 1;
 }
 
 
@@ -112,7 +155,9 @@ static void entail_cbr_in(struct scenario *s, char *s_time)
  */
 static void parse_ns2_new_wireless_event(struct scenario *s, char *data[])
 {
+	int ret;
 	enum event_type et;
+	void *packet;
 
 	assert(s && data[NS2_TR_TIME]);
 
@@ -120,8 +165,23 @@ static void parse_ns2_new_wireless_event(struct scenario *s, char *data[])
 	et = packet_type(data);
 
 	switch (et) {
-		case ET_CBR_IN:
-			entail_cbr_in(s, data[NS2_TR_TIME]);
+		case ET_PACKET_CBR:
+			packet = alloc_packet_container(ET_PACKET_CBR);
+			ret = map_cbr_data(packet, data);
+			if (!ret) { /* something failed[tm] */
+				free_packet_container(ET_PACKET_CBR, packet);
+				return;
+			}
+			enqueue_event(s, data[NS2_TR_TIME], ET_PACKET_CBR, packet);
+			break;
+		case ET_PACKET_OLSR:
+			packet = alloc_packet_container(ET_PACKET_OLSR);
+			ret = map_olsr_data(packet, data);
+			if (!ret) { /* something failed[tm] */
+				free_packet_container(ET_PACKET_OLSR, packet);
+				return;
+			}
+			enqueue_event(s, data[NS2_TR_TIME], ET_PACKET_OLSR, packet);
 			break;
 		case ET_UNKNOWN:
 			/* packet is not handled or even recognized

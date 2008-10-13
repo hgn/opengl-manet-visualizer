@@ -21,6 +21,8 @@ def build(bld):
 			'trace-parser.c',
 			'gl-text.c',
 			'trace-parser-ns2.c',
+			'packet.c',
+			'gl-packet.c',
 			]
   main.target       = 'network-visualizer'
   main.includes     = '. /usr/include ../src'

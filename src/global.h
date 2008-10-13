@@ -53,8 +53,9 @@ enum image_file_type {
 #define	TRACE_FILE_DEFAULT TRACE_FILE_FAKE
 
 enum event_type {
-	ET_CBR_IN = 1,
-	ET_UNKNOWN
+	ET_UNKNOWN = 1,
+	ET_PACKET_OLSR,
+	ET_PACKET_CBR
 };
 
 struct position {
@@ -73,6 +74,16 @@ struct node {
 	struct list_head position_list;
 
 	struct list_head list;
+};
+
+/* definition for ET_PACKET_OLSR */
+struct packet_olsr {
+	uint32_t src, dst, data_size;
+};
+
+/* definition for ET_PACKET_CBR */
+struct packet_cbr {
+	uint32_t src, dst, data_size;
 };
 
 /* the next define defines the amount of time
@@ -143,9 +154,7 @@ void mouseMovement(int, int);
 /* event.c */
 void activate_event(struct list_head *, struct event *);
 struct event *peek_next_event(struct scenario *);
-
-
-
+void add_event(struct scenario *, double, uint32_t, void *);
 
 /* trace-parser.c */
 struct scenario *parse_offline_scenario(int, const char *);
@@ -161,6 +170,7 @@ void cli_display_events(struct list_head *);
 /* scenario.c */
 struct scenario *alloc_scenario(void);
 struct node *get_node_by_id(struct scenario *, uint32_t);
+int add_node_to_scenario(struct scenario *, struct node *);
 
 void print_nodes_info(struct scenario *);
 
@@ -169,6 +179,7 @@ void print_node_info(struct node *);
 void init_nodes(struct scenario *);
 int get_node_pos_by_time(struct node *, double, float *, float *);
 struct node *alloc_node(uint32_t);
+void add_position_data_to_node(struct node *, double, uint32_t, uint32_t);
 
 /* gl-nodes.c */
 int init_gl_nodes(void);
@@ -176,6 +187,12 @@ int init_gl_nodes(void);
 /* gl-text.c */
 void render_node_info_string(char *, float, float, float);
 
+/* packet.c */
+void *alloc_packet_container(uint32_t);
+void free_packet_container(uint32_t, void *);
+
+/* gl-packet.c */
+void visualize_packets(void);
 
 
 

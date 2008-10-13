@@ -38,6 +38,7 @@ int add_node_to_scenario(struct scenario *s, struct node *n)
 	assert(s && n);
 
 	INIT_LIST_HEAD(&n->list);
+
 	list_add(&n->list, &s->node_list);
 
 	return 0;

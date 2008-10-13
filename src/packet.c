@@ -17,32 +17,64 @@
 */
 
 #include "global.h"
-
 #include <assert.h>
 
-
-struct scenario *parse_offline_scenario(int format, const char *filename)
+static void *alloc_packet_container_olsr(void)
 {
+	return xalloc(sizeof(struct packet_olsr));
+}
 
-	assert(filename);
-	assert(format > 0);
+static void *alloc_packet_container_cbr(void)
+{
+	return xalloc(sizeof(struct packet_cbr));
+}
 
-	switch (format) {
-		case TRACE_FILE_FAKE:
+void *alloc_packet_container(uint32_t type)
+{
+	assert(type > 0);
+
+	switch (type) {
+		case ET_PACKET_OLSR:
+			return alloc_packet_container_olsr();
 			break;
-		case TRACE_FILE_NS2:
-			return parse_ns2_new_wireless_scenario(filename);
+		case ET_PACKET_CBR:
+			return alloc_packet_container_cbr();
 			break;
 		default:
-			die("Programmed error in switch/case statementn");
+			die("Programmed error - packet type not known\n");
 			break;
 	}
 
-	return NULL;
+	return NULL; /* should never happen */
 }
 
+static void free_packet_container_cbr(void *p)
+{
+	free(p);
+}
 
+static void free_packet_container_olsr(void *p)
+{
+	free(p);
+}
 
+void free_packet_container(uint32_t t, void *p)
+{
+	assert(p);
+	assert(t > 0);
+
+	switch (t) {
+		case ET_PACKET_OLSR:
+			return free_packet_container_cbr(p);
+			break;
+		case ET_PACKET_CBR:
+			return free_packet_container_olsr(p);
+			break;
+		default:
+			die("Programmed error - packet type not known\n");
+			break;
+	}
+}
 
 
 /* vim: set tw=78 ts=4 sw=4 sts=4 ff=unix noet: */

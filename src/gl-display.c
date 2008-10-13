@@ -180,6 +180,8 @@ void display(void)
 	draw_ground();
 	draw_terrain();
 
+	visualize_packets();
+
 #if 0
 	glPushMatrix();
 	glColor3f( 1.0f, 1.0f, 0.0f );

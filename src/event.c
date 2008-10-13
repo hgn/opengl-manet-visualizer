@@ -19,6 +19,8 @@
 #include "global.h"
 #include <assert.h>
 
+uint32_t active_events;
+
 static void print_event_unknown_info(struct event *e)
 {
 	fprintf(stdout, "event [time: %lf, type: UNKNOWN]\n", e->time);
@@ -35,8 +37,6 @@ struct list_head *init_active_event_list(void)
 	return l;
 }
 
-uint32_t active_events;
-
 /**
  * Enqueue event to the active list
  */
@@ -51,8 +51,6 @@ void activate_event(struct list_head *a_ev_l, struct event *event)
 static int is_event_outdated(struct event *e)
 {
 	assert(e);
-
-	//fprintf(stderr, "e_time %lf curr %lf\n", e->time, simulator_time());
 
 	if (e->time + EVENT_PERSISTENCE_TIME < simulator_time())
 		return 1;
@@ -143,6 +141,8 @@ void print_event_info(struct event *e)
 void add_event(struct scenario *s, double time, uint32_t type, void *data)
 {
 	struct event *e;
+
+	assert(s);
 
 	e =  xalloc(sizeof(struct event));
 
