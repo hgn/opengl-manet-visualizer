@@ -180,6 +180,8 @@ void display(void)
 	draw_ground();
 	draw_terrain();
 
+	map_draw_nodes();
+
 	visualize_packets();
 
 #if 0
@@ -226,7 +228,6 @@ void display(void)
 	 *  o node illustration
 	 *  o node infotext
 	 */
-	map_draw_nodes();
 
 
 	GLUquadricObj *cyl;

@@ -103,12 +103,13 @@ static void draw_node_at_pos(struct node *node, float x, float y)
 	GLUquadricObj *cyl;
 	cyl = gluNewQuadric();
 
+	glEnable(GL_BLEND);
+	glEnable( GL_COLOR_MATERIAL );
+	glEnable( GL_LIGHTING );
+	glEnable( GL_LIGHT0 );
+	glEnable( GL_DEPTH_TEST );
 
 	/* transmission range */
-	glDisable(GL_DEPTH_TEST );
-	glDisable(GL_LIGHT0 );
-	glDisable(GL_LIGHTING );
-	glDisable(GL_COLOR_MATERIAL );
 	glPushMatrix();
 	glColor4f(node->color[0], node->color[1], node->color[2], 0.4f);
 	glRotatef(90., 1., 0., 0.);
@@ -120,11 +121,6 @@ static void draw_node_at_pos(struct node *node, float x, float y)
 	gluDisk(quadratic1,0.2f,7.0f,32,32);
 	glPopMatrix();
 
-	glEnable(GL_BLEND);
-	glEnable( GL_COLOR_MATERIAL );
-	glEnable( GL_LIGHTING );
-	glEnable( GL_LIGHT0 );
-	glEnable( GL_DEPTH_TEST );
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor3f(node->color[0], node->color[1], node->color[2]);
 

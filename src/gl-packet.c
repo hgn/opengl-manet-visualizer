@@ -50,13 +50,15 @@ static void draw_packet_olsr(struct event *e)
 
 	pc = (struct packet_olsr *) e->data;
 
+	/* calculate node position for source
+	 * and destination of packet */
 	node_position(pc->src, &src_x, &src_y);
 	node_position(pc->dst, &dst_x, &dst_y);
 
 	glBegin(GL_LINES);
 	glLineWidth(4.0);
 	glNormal3f(1.0f, 1.0f, 1.0f);
-	glColor3f( 1.0f, 1.0f, 0.0f );
+	glColor3f(1.0f, 1.0f, 0.0f );
 	glVertex3f(src_x / 20, 0.01f, src_y / 20);
 	glVertex3f(dst_x / 20, 0.01f, dst_y / 20);
 	glEnd();
@@ -72,15 +74,17 @@ static void draw_packet_cbr(struct event *e)
 
 	pc = (struct packet_cbr *) e->data;
 
+	/* calculate node position for source
+	 * and destination of packet */
 	node_position(pc->src, &src_x, &src_y);
 	node_position(pc->dst, &dst_x, &dst_y);
 
 	glBegin(GL_LINES);
 	glLineWidth(4.0);
 	glNormal3f(1.0f, 1.0f, 1.0f);
-	glColor3f( 1.0f, 0.0f, 0.0f );
-	glVertex3f(src_x/20, 0.01f, src_y/20);
-	glVertex3f(dst_x/20, 0.01f, dst_y/20);
+	glColor3f(1.0f, 0.0f, 0.0f );
+	glVertex3f(src_x / 20, 0.01f, src_y / 20);
+	glVertex3f(dst_x / 20, 0.01f, dst_y / 20);
 	glEnd();
 }
 
@@ -109,7 +113,7 @@ static void draw_packet(struct event *e)
 
 	}
 
-	draw_packet_cbr(e);
+	return;
 }
 
 /**
