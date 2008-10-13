@@ -20,7 +20,10 @@
 #include <assert.h>
 #include <sys/time.h>
 
+
+int simulation_paused;
 struct timeval reference_time;
+
 
 /**
  * setup_simulator_ref_time() intialize
@@ -32,13 +35,16 @@ void setup_simulator_ref_time(void)
 }
 
 
-
 double simulator_time(void)
 {
 	double ret;
-	struct timeval current_time;
+	static struct timeval current_time;
 
-	gettimeofday(&current_time, NULL);
+	if (!simulation_paused) {
+		/* we are stop the time if the visualization
+		 * paused - wow, we are playing god! ;-) */
+		gettimeofday(&current_time, NULL);
+	}
 
 	ret = (((double)current_time.tv_sec - reference_time.tv_sec)) +
 		(((double)current_time.tv_usec - reference_time.tv_usec) / 1000000);

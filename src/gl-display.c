@@ -18,6 +18,8 @@
 
 #include "global.h"
 
+extern int simulation_paused;
+
 float CAMERA_Pitch = 0.0f;
 float CAMERA_Yaw = 0.0f;
 float CAMERA_Move = 1.0f;
@@ -387,6 +389,14 @@ void keyboard(unsigned char key, int x, int y)
 				xpos -= (float) cos(yrotrad) * 0.2;
 				zpos -= (float) sin(yrotrad) * 0.2;
 			}
+			break;
+		case 'p':
+			if (simulation_paused) {
+				/* we are restarting our simulation, so
+				 * reinit the simulation reference time */
+				setup_simulator_ref_time();
+			}
+			simulation_paused = !simulation_paused;
 			break;
 		case 'g':
 			{
