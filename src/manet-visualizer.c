@@ -111,7 +111,6 @@ int main(int ac, char **av)
 	init_skybox();
 	init_terrain();
 	init_gl_nodes();
-	init_ground();
 
 	while (23) {
 		glutMainLoop();

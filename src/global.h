@@ -184,6 +184,9 @@ void add_position_data_to_node(struct node *, double, uint32_t, uint32_t);
 /* gl-nodes.c */
 int init_gl_nodes(void);
 
+/* gl-node.c */
+void map_draw_nodes(void);
+
 /* gl-text.c */
 void render_node_info_string(char *, float, float, float);
 

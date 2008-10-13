@@ -109,7 +109,7 @@ char load_model_3ds(obj_type_ptr p_object, char *p_filename)
 			case 0x4110: 
 				fread (&l_qty, sizeof (unsigned short), 1, l_file);
 				p_object->vertices_qty = l_qty;
-				printf("Number of vertices: %d\n",l_qty);
+				//printf("Number of vertices: %d\n",l_qty);
 				for (i=0; i<l_qty; i++)
 				{
 					fread (&p_object->vertex[i].x, sizeof(float), 1, l_file);
@@ -131,7 +131,7 @@ char load_model_3ds(obj_type_ptr p_object, char *p_filename)
 			case 0x4120:
 				fread (&l_qty, sizeof (unsigned short), 1, l_file);
 				p_object->polygons_qty = l_qty;
-				printf("Number of polygons: %d\n",l_qty); 
+				//printf("Number of polygons: %d\n",l_qty); 
 				for (i=0; i<l_qty; i++)
 				{
 					fread (&p_object->polygon[i].a, sizeof (unsigned short), 1, l_file);

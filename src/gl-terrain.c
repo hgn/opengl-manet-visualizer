@@ -32,7 +32,6 @@ static GLuint terrain_outer_list;
 
 int init_terrain(void)
 {
-	int i;
 	struct image *image;
 	float max_x, max_z;
 

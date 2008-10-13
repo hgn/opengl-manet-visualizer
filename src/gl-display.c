@@ -168,7 +168,6 @@ void display(void)
 	glTranslated(-xpos, -ypos, -zpos);
 
 	draw_skybox(yrot, xrot);
-	draw_ground();
 	draw_terrain();
 
 	map_draw_nodes();

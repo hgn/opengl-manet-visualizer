@@ -98,7 +98,6 @@ static void draw_nodes(void)
 
 static void draw_node_at_pos(struct node *node, float x, float y)
 {
-	int i;
 
 	GLUquadricObj *cyl;
 	cyl = gluNewQuadric();
