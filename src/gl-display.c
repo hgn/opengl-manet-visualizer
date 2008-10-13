@@ -283,9 +283,6 @@ void display(void)
 
 #endif
 
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	render_node_info_string("node 2", 2.0f, 0.5f, 0.0f);
-
 	glDisable(GL_DEPTH_TEST );
 	glDisable(GL_LIGHT0 );
 	glDisable(GL_LIGHTING );
@@ -296,11 +293,10 @@ void display(void)
      frame++;
      time=glutGet(GLUT_ELAPSED_TIME);
      if (time - timebase > 1000) {
-         sprintf(s,"FPS: %4.2f",frame*1000.0/(time-timebase));
+         sprintf(s, "FPS: %4.2f", frame * 1000.0 / (time - timebase));
          timebase = time;
          frame = 0;
      }
-
 
 
 
@@ -347,12 +343,12 @@ void keyboard(unsigned char key, int x, int y)
 			exit(0);
 			break;
 		case 'q':
-xrot += 1;
-     if (xrot >360) xrot -= 360;
+			xrot += 1;
+			if (xrot >360) xrot -= 360;
 			break;
 		case 'z':
-xrot -= 1;
-     if (xrot < -360) xrot += 360;
+			xrot -= 1;
+			if (xrot < -360) xrot += 360;
 
 			break;
 		case 'w':
