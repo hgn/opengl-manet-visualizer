@@ -134,7 +134,12 @@ void print_event_info(struct event *e)
 }
 
 
-
+/**
+ * add_event is the interface to the format and type neutral
+ * intrinsic interface. add_event() add this event to the internal
+ * _ordered_ list! This means that events that are added must be added
+ * in the right order - this is up to the callee.
+ */
 void add_event(struct scenario *s, double time, uint32_t type, void *data)
 {
 	struct event *e;
