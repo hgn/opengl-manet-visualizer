@@ -20,6 +20,7 @@ def build(bld):
 			'time.c',
 			'trace-parser.c',
 			'gl-text.c',
+			'trace-parser-ns2.c',
 			]
   main.target       = 'network-visualizer'
   main.includes     = '. /usr/include ../src'
