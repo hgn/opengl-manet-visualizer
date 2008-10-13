@@ -106,9 +106,6 @@ static void drawText3(const char * message)
 	glColor4ub(0, 0, 0, 255);
 	glRasterPos2f((GLfloat)7, (GLfloat)31);
 
-	/*
-	 * write using bitmap and stroke chars
-	 */
 	while (*message) {
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *message);
 		message++;

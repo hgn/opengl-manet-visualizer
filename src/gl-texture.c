@@ -56,9 +56,6 @@ static struct image *load_image_bmp(char *filename)
 		return NULL;
 	}
 
-	fprintf(stderr, "# image size: %dx%d\n",
-			image->size_x, image->size_y);
-
 	size = image->size_x * image->size_y * 3;
 
 	if ((fread(&planes, 2, 1, file)) != 1) {
@@ -118,6 +115,7 @@ struct image *load_image(char *filename, enum image_file_type ift)
 			die("programmed error - unsupported image file type");
 			break;
 	}
+	return NULL;
 }
 
 
