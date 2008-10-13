@@ -24,6 +24,18 @@ extern struct scenario *scenario;
 extern struct list_head *a_ev_l;
 extern uint32_t active_events;
 
+struct __packet_color_tbl {
+	float r, g, b;
+} pc_tbl[] = {
+#define	COL_PACKET_CBR 0
+	{ 1.0, 0.0, 0.0},
+#define	COL_PACKET_OLSR 1
+	{ 1.0, 1.0, 0.0},
+#define	COL_PACKET_UNKNOWN 2
+	{ 0.0, 0.0, 0.0}
+};
+
+
 static void node_position(uint32_t node_id, float *x, float *y)
 {
 	struct list_head *iter;
@@ -57,8 +69,10 @@ static void draw_packet_olsr(struct event *e)
 
 	glBegin(GL_LINES);
 	glLineWidth(4.0);
-	//glNormal3f(1.0f, 1.0f, 1.0f);
-	glColor3f(1.0f, 1.0f, 0.0f );
+	glNormal3f(1.0f, 1.0f, 1.0f);
+	glColor3f(pc_tbl[COL_PACKET_OLSR].r,
+			  pc_tbl[COL_PACKET_OLSR].g,
+			  pc_tbl[COL_PACKET_OLSR].b);
 	glVertex3f(src_x / 20, 0.01f, src_y / 20);
 	glVertex3f(dst_x / 20, 0.01f, dst_y / 20);
 	glEnd();
@@ -81,8 +95,10 @@ static void draw_packet_cbr(struct event *e)
 
 	glBegin(GL_LINES);
 	glLineWidth(4.0);
-	//glNormal3f(1.0f, 1.0f, 1.0f);
-	glColor3f(1.0f, 0.0f, 0.0f );
+	glNormal3f(1.0f, 1.0f, 1.0f);
+	glColor3f(pc_tbl[COL_PACKET_CBR].r,
+			  pc_tbl[COL_PACKET_CBR].g,
+			  pc_tbl[COL_PACKET_CBR].b);
 	glVertex3f(src_x / 20, 0.01f, src_y / 20);
 	glVertex3f(dst_x / 20, 0.01f, dst_y / 20);
 	glEnd();
