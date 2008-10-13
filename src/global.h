@@ -92,7 +92,7 @@ struct packet_cbr {
  * to display the event a little bit longer then
  * 0.0001 seconds
  */
-#define	EVENT_PERSISTENCE_TIME 0.2
+#define	EVENT_PERSISTENCE_TIME 0.25
 
 struct event {
 	double time;

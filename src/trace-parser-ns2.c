@@ -128,6 +128,9 @@ static int map_cbr_data(void *p, char *d[])
 	return 1;
 }
 
+#define POS_NS2_OLSR_SRC 26
+#define POS_NS2_OLSR_DST 8
+
 static int map_olsr_data(void *p, char *d[])
 {
 	struct packet_olsr *cp;
@@ -141,8 +144,8 @@ static int map_olsr_data(void *p, char *d[])
 
 	cp = (struct packet_olsr *)p;
 
-	cp->src       = atoi(d[POS_NS2_MAC_SRC]);
-	cp->dst       = atoi(d[POS_NS2_MAC_DST]);
+	cp->src       = atoi(d[POS_NS2_OLSR_SRC]);
+	cp->dst       = atoi(d[POS_NS2_OLSR_DST]);
 	cp->data_size = atoi(d[POS_NS2_SIZE]);
 
 	return 1;
