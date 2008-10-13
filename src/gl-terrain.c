@@ -80,16 +80,16 @@ int init_terrain(void)
 	glNormal3f(0.0f, 1.0f, 0.0f);
 
 	glTexCoord2f(0.0f, 100.f);
-	glVertex3f(0.0f, -1.0f, 0.0f);
+	glVertex3f(-100.0f, -1.0f, -100.0f);
 
 	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(0.0f, -1.0f, max_z);
+	glVertex3f(-100.0f, -1.0f, max_z * 10);
 
 	glTexCoord2f(100.f, 0.0f);
-	glVertex3f(max_x, -1.0f, max_z);
+	glVertex3f(max_x, -1.0f, max_z * 10);
 
 	glTexCoord2f(100.f, 100.f);
-	glVertex3f(max_x, -1.0f, 0.0f);
+	glVertex3f(max_x * 10, -1.0f, -100.0f);
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);

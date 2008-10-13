@@ -39,20 +39,16 @@ void reshape(int w, int h)
 	screen_width = w;
 	screen_height = h;
 
-	glViewport (0, 0, (GLsizei)w, (GLsizei)h);
+	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	gluPerspective (45.0, (GLfloat)w/(GLfloat)h, 0.1, 100.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0, (GLfloat)w/(GLfloat)h, 0.1, 100.0);
 
-	glMatrixMode (GL_MODELVIEW);
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity ();
 
 	glutPostRedisplay ();
-}
-
-static void render( float camera_yaw, float camera_pitch )
-{
 }
 
 float lastx, lasty;
@@ -80,7 +76,7 @@ static void drawText(const char * message)
 	 */
 	while (*message) {
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *message);
-		*message++;
+		message++;
 		//glutStrokeCharacter(GLUT_STROKE_ROMAN,*message++);
 	}
 }
@@ -98,8 +94,7 @@ static void drawText2(const char * message)
 	 */
 	while (*message) {
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *message);
-		*message++;
-		//glutStrokeCharacter(GLUT_STROKE_ROMAN,*message++);
+		message++;
 	}
 }
 
@@ -116,8 +111,7 @@ static void drawText3(const char * message)
 	 */
 	while (*message) {
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *message);
-		*message++;
-		//glutStrokeCharacter(GLUT_STROKE_ROMAN,*message++);
+		message++;
 	}
 }
 
@@ -309,6 +303,9 @@ void display(void)
 
 void special( int key, int x, int y )
 {
+	(void) x;
+	(void) y;
+
 	switch( key )
 	{
 		// Deplacement de la camera
@@ -340,8 +337,10 @@ void special( int key, int x, int y )
 
 void keyboard(unsigned char key, int x, int y)
 {
-	switch( key )
-	{
+	(void) x;
+	(void) y;
+
+	switch( key ) {
 		case 27 :
 			exit(0);
 			break;
@@ -352,7 +351,6 @@ void keyboard(unsigned char key, int x, int y)
 		case 'z':
 			xrot -= 1;
 			if (xrot < -360) xrot += 360;
-
 			break;
 		case 'w':
 			{
@@ -367,48 +365,48 @@ void keyboard(unsigned char key, int x, int y)
 			}
 			break;
 		case 's':
-{
-     float xrotrad, yrotrad;
-     yrotrad = (yrot / 180 * 3.141592654f);
-     xrotrad = (xrot / 180 * 3.141592654f); 
-     xpos -= (float) sin(yrotrad);
-     zpos += (float) cos(yrotrad);
-     ypos += (float) sin(xrotrad);
+			{
+				float xrotrad, yrotrad;
+				yrotrad = (yrot / 180 * 3.141592654f);
+				xrotrad = (xrot / 180 * 3.141592654f);
+				xpos -= (float) sin(yrotrad);
+				zpos += (float) cos(yrotrad);
+				ypos += (float) sin(xrotrad);
 				if (ypos < 0)
 					ypos = 0.0;
-     }
+			}
 			break;
 		case 'd':
-{
-     float yrotrad;
-     yrotrad = (yrot / 180 * 3.141592654f);
-     xpos += (float) cos(yrotrad) * 0.2;
-     zpos += (float) sin(yrotrad) * 0.2;
-     }
+			{
+				float yrotrad;
+				yrotrad = (yrot / 180 * 3.141592654f);
+				xpos += (float) cos(yrotrad) * 0.2;
+				zpos += (float) sin(yrotrad) * 0.2;
+			}
 			break;
 		case 'a':
-{
-	float yrotrad;
-	yrotrad = (yrot / 180 * 3.141592654f);
-	xpos -= (float) cos(yrotrad) * 0.2;
-	zpos -= (float) sin(yrotrad) * 0.2;
-}
-break;
+			{
+				float yrotrad;
+				yrotrad = (yrot / 180 * 3.141592654f);
+				xpos -= (float) cos(yrotrad) * 0.2;
+				zpos -= (float) sin(yrotrad) * 0.2;
+			}
+			break;
 		case 'g':
-		{
-			static int wireframe_enable = 0;
-
-			wireframe_enable = !wireframe_enable;
-
-			if( wireframe_enable )
 			{
-				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+				static int wireframe_enable = 0;
+
+				wireframe_enable = !wireframe_enable;
+
+				if (wireframe_enable)
+				{
+					glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+				}
+				else
+				{
+					glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+				}
 			}
-			else
-			{
-				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			}
-		}
 	}
 }
 

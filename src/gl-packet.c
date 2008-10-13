@@ -69,12 +69,12 @@ static void draw_packet_olsr(struct event *e)
 
 	glBegin(GL_LINES);
 	glLineWidth(4.0);
-	glNormal3f(1.0f, 1.0f, 1.0f);
+	glNormal3f(1.0f, 0.0f, 1.0f);
 	glColor3f(pc_tbl[COL_PACKET_OLSR].r,
 			  pc_tbl[COL_PACKET_OLSR].g,
 			  pc_tbl[COL_PACKET_OLSR].b);
-	glVertex3f(src_x / 20, 0.01f, src_y / 20);
-	glVertex3f(dst_x / 20, 0.01f, dst_y / 20);
+	glVertex3f(src_x / 20, -0.5f, src_y / 20);
+	glVertex3f(dst_x / 20, -0.5f, dst_y / 20);
 	glEnd();
 }
 
@@ -99,8 +99,8 @@ static void draw_packet_cbr(struct event *e)
 	glColor3f(pc_tbl[COL_PACKET_CBR].r,
 			  pc_tbl[COL_PACKET_CBR].g,
 			  pc_tbl[COL_PACKET_CBR].b);
-	glVertex3f(src_x / 20, 0.01f, src_y / 20);
-	glVertex3f(dst_x / 20, 0.01f, dst_y / 20);
+	glVertex3f(src_x / 20, -0.5f, src_y / 20);
+	glVertex3f(dst_x / 20, -0.5f, dst_y / 20);
 	glEnd();
 }
 
