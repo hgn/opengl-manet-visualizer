@@ -168,6 +168,7 @@ void print_nodes_info(struct scenario *);
 void print_node_info(struct node *);
 void init_nodes(struct scenario *);
 int get_node_pos_by_time(struct node *, double, float *, float *);
+struct node *alloc_node(uint32_t);
 
 /* gl-nodes.c */
 int init_gl_nodes(void);

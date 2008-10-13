@@ -38,6 +38,7 @@ static int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
 	struct node *node;
 
 	assert(s);
+	assert(data);
 
 	/* some sanity checks first */
 	if (!data[NS2_TR_TIME] || !data[NS2_TR_NODE_ID] || !data[NS2_TR_POS_X] || !data[NS2_TR_POS_Y])
