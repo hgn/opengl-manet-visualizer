@@ -73,7 +73,7 @@ static int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
  * like agt or olsr routing packets. As a rule of thumb:
  * detect here all what you want to display.
  */
-static enum event_type categorize_event(char *data[])
+static enum event_type packet_type(char *data[])
 {
 	/* it is a valid date that a line is not always
 	 * of the same length -> sanity checks first */
@@ -117,7 +117,7 @@ static void parse_ns2_new_wireless_event(struct scenario *s, char *data[])
 	assert(s && data[NS2_TR_TIME]);
 
 	/* categorize event */
-	et = categorize_event(data);
+	et = packet_type(data);
 
 	switch (et) {
 		case ET_CBR_IN:
