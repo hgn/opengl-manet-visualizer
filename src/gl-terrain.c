@@ -168,14 +168,27 @@ int init_terrain(void)
 void draw_terrain(void)
 {
 
-#if 0
-	int x, y;
+	double i;
 
-
-#endif
 
 	glCallList(terrain_inner_list);
 	glCallList(terrain_outer_list);
+
+	/* and draw distance grid */
+
+	glBegin(GL_LINES);
+	glLineWidth(1.0);
+	glNormal3f(1.0f, 0.0f, 0.0f);
+	glColor3f( 1.0f, 1.0f, 1.0f );
+		for(i = -100; i <= 100; i += 1) {
+			glVertex3f(i, -0.9f, 100.0f);
+			glVertex3f(i, -0.9f, -100.0f);
+		}
+		for(i = -100; i <= 100; i += 1) {
+			glVertex3f(100.0, -0.9f, i);
+			glVertex3f(-100.0, -0.9f, i);
+		}
+	glEnd();
 
 
 }

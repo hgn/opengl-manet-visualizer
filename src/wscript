@@ -10,7 +10,6 @@ def build(bld):
 			'gl-texture.c',
 			'gl-skybox.c',
 			'gl-display.c',
-			'gl-ground.c',
 			'gl-node.c',
 			'gl-model-loader.c',
 			'gl-terrain.c',
