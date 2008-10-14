@@ -124,6 +124,11 @@ struct scenario {
 };
 
 
+struct globals {
+	uint32_t screen_width, screen_height;
+};
+
+
 /* terrain.c */
 void draw_terrain(void);
 int init_terrain(void);
@@ -196,6 +201,7 @@ void map_draw_nodes(void);
 
 /* gl-text.c */
 void render_node_info_string(char *, float, float, float);
+void draw_text(const char *, const float *, const float *);
 
 /* packet.c */
 void *alloc_packet_container(uint32_t);
@@ -203,6 +209,9 @@ void free_packet_container(uint32_t, void *);
 
 /* gl-packet.c */
 void visualize_packets(void);
+
+/* gl-infobox.c */
+void draw_infobox(void);
 
 
 

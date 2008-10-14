@@ -20,6 +20,7 @@
 #include <locale.h>
 #include <sys/utsname.h>
 
+struct globals globals;
 struct scenario *scenario;
 struct list_head *a_ev_l;
 static struct event *next_event = NULL;

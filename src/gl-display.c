@@ -26,20 +26,16 @@ float CAMERA_Move = 1.0f;
 
 float xpos = 0, ypos = 0, zpos = 0, xrot = 0, yrot = 0, angle=0.0;
 
-int screen_width, screen_height;
-
-int frame,time,timebase=0;
-char s[30];
+extern struct globals globals;
 
 void reshape(int w, int h)
 {
-	if (h == 0)
-	{
+	if (h == 0) {
 		h = 1;
 	}
 
-	screen_width = w;
-	screen_height = h;
+	globals.screen_width = w;
+	globals.screen_height = h;
 
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 
@@ -57,97 +53,12 @@ float lastx, lasty;
 
 void mouseMovement(int x, int y)
 {
-	int diffx=x-lastx; //check the difference between the current x and the last x position
-	int diffy=y-lasty; //check the difference between the current y and the last y position
-	lastx=x; //set lastx to the current x position
-	lasty=y; //set lasty to the current y position
+	int diffx = x - lastx; //check the difference between the current x and the last x position
+	int diffy = y - lasty; //check the difference between the current y and the last y position
+	lastx = x; //set lastx to the current x position
+	lasty = y; //set lasty to the current y position
 	xrot += (float) diffy; //set the xrot to xrot with the addition of the difference in the y position
 	yrot += (float) diffx;  //set the xrot to yrot with the addition of the difference in the x position
-}
-
-static void drawText(const char * message)
-{
-	/* raster pos sets the current raster position
-	 * mapped via the modelview and projection matrices
-	 */
-	glColor4ub(0, 0, 0, 255);
-	glRasterPos2f((GLfloat)7, (GLfloat)17);
-
-	/*
-	 * write using bitmap and stroke chars
-	 */
-	while (*message) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *message);
-		message++;
-		//glutStrokeCharacter(GLUT_STROKE_ROMAN,*message++);
-	}
-}
-
-static void drawText2(const char * message)
-{
-	/* raster pos sets the current raster position
-	 * mapped via the modelview and projection matrices
-	 */
-	glColor4ub(0, 0, 0, 255);
-	glRasterPos2f((GLfloat)7, (GLfloat)45);
-
-	/*
-	 * write using bitmap and stroke chars
-	 */
-	while (*message) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *message);
-		message++;
-	}
-}
-
-static void drawText3(const char * message)
-{
-	/* raster pos sets the current raster position
-	 * mapped via the modelview and projection matrices
-	 */
-	glColor4ub(0, 0, 0, 255);
-	glRasterPos2f((GLfloat)7, (GLfloat)31);
-
-	while (*message) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *message);
-		message++;
-	}
-}
-
-
-static void draw_menu(void) {
-
-	glViewport(0,0,screen_width,screen_height);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, screen_width,screen_height, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	glBegin(GL_QUADS);
-	glColor4ub(200, 200, 200, 100);
-	glVertex2i( 5, 50); // Bottom Left
-	glVertex2i( 200, 50); // Bottom Right
-	glVertex2i( 200, 5); // Top Right
-	glVertex2i( 5, 5);
-	glEnd();
-
-#define MESSAGE	"MANET Network Visualizer"
-
-	char *msg = MESSAGE;
-	char s_time_str[64];
-	snprintf(s_time_str, sizeof(s_time_str), "Time: %.2lfs", simulator_time());
-
-	drawText(msg);
-	drawText2(s);
-	drawText3(s_time_str);
-
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
 }
 
 
@@ -283,17 +194,7 @@ void display(void)
 	glDisable(GL_LIGHTING );
 	glDisable(GL_COLOR_MATERIAL );
 
-	draw_menu();
-
-     frame++;
-     time=glutGet(GLUT_ELAPSED_TIME);
-     if (time - timebase > 1000) {
-         sprintf(s, "FPS: %4.2f", frame * 1000.0 / (time - timebase));
-         timebase = time;
-         frame = 0;
-     }
-
-
+	draw_infobox();
 
 	glutSwapBuffers();
 	glutPostRedisplay();

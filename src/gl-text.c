@@ -31,5 +31,22 @@ void render_node_info_string(char *string, float x, float y, float z)
 	}
 }
 
+void draw_text(const char * message, const float *x, const float *y)
+{
+	/* raster pos sets the current raster position
+	 * mapped via the modelview and projection matrices
+	 */
+	glColor4ub(0, 0, 0, 255);
+	glRasterPos2f(*x, *y);
+
+	/*
+	 * write using bitmap and stroke chars
+	 */
+	while (*message) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *message);
+		message++;
+	}
+}
+
 
 /* vim: set tw=78 ts=4 sw=4 sts=4 ff=unix noet: */
