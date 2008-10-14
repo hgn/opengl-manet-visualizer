@@ -195,6 +195,7 @@ void display(void)
 	glDisable(GL_COLOR_MATERIAL );
 
 	draw_infobox();
+	draw_cockpit();
 
 	glutSwapBuffers();
 	glutPostRedisplay();

@@ -210,6 +210,10 @@ void free_packet_container(uint32_t, void *);
 /* gl-packet.c */
 void visualize_packets(void);
 
+/* gl-cockpit.c */
+void draw_cockpit(void);
+
+
 /* gl-infobox.c */
 void draw_infobox(void);
 

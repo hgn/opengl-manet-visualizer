@@ -23,6 +23,7 @@ def build(bld):
 			'packet.c',
 			'gl-packet.c',
 			'gl-infobox.c',
+			'gl-cockpit.c',
 			]
   main.target       = 'network-visualizer'
   main.includes     = '. /usr/include ../src'
