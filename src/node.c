@@ -95,6 +95,7 @@ struct node *alloc_node(uint32_t id)
 
 	INIT_LIST_HEAD(&n->list);
 	INIT_LIST_HEAD(&n->position_list);
+	INIT_LIST_HEAD(&n->traffic_profile_list);
 
 	return n;
 }

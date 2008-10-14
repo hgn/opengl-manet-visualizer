@@ -65,6 +65,12 @@ struct position {
 	struct list_head list;
 };
 
+struct traffic_profile {
+	uint32_t type; /* OLSR, CBR, ... */
+	uint32_t *usage; /* list per second in bit/s */
+	struct list_head list;
+};
+
 struct node {
 	uint32_t id;
 	char *name;
@@ -72,6 +78,7 @@ struct node {
 
 	uint32_t position_data_entries;
 	struct list_head position_list;
+	struct list_head traffic_profile_list;
 
 	struct list_head list;
 };

@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <assert.h>
 
+#define	NS2_TRACE_MAX_DATA 128
 
 #define	NS2_TR_EV_TYPE     0
 #define	NS2_TR_TIME        2
@@ -196,7 +197,41 @@ static void parse_ns2_new_wireless_event(struct scenario *s, char *data[])
 	}
 }
 
-#define	IA_SIZE 128
+static void calculate_traffic_profile(struct scenario *scenario, FILE *fp)
+{
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	unsigned int first_round, line_no;
+
+	while ((read = getline(&line, &len, fp)) != -1) {
+
+		int iter;
+		char *data[NS2_TRACE_MAX_DATA];
+
+		/* null out point array  */
+		for (iter = 0; iter < NS2_TRACE_MAX_DATA; iter++)
+			data[iter] = NULL;
+
+		/* format description:
+		 * http://www.isi.edu/nsnam/ns/doc/node186.html
+		 */
+
+		iter = 0;
+
+		data[iter++] = strtok(line, " ");
+
+		while (iter < NS2_TRACE_MAX_DATA && (data[iter++] = strtok(NULL, " ")))
+			;
+
+	   line_no++;
+
+	}
+
+	if (line)
+		free(line);
+}
+
 
 struct scenario *parse_ns2_new_wireless_scenario(const char *file)
 {
@@ -222,10 +257,10 @@ struct scenario *parse_ns2_new_wireless_scenario(const char *file)
 	while ((read = getline(&line, &len, fp)) != -1) {
 
 		int iter;
-		char *data[IA_SIZE];
+		char *data[NS2_TRACE_MAX_DATA];
 
 		/* null out point array  */
-		for (iter = 0; iter < IA_SIZE; iter++)
+		for (iter = 0; iter < NS2_TRACE_MAX_DATA; iter++)
 			data[iter] = NULL;
 
 		/* format description:
@@ -236,7 +271,7 @@ struct scenario *parse_ns2_new_wireless_scenario(const char *file)
 
 		data[iter++] = strtok(line, " ");
 
-		while (iter < IA_SIZE && (data[iter++] = strtok(NULL, " ")))
+		while (iter < NS2_TRACE_MAX_DATA && (data[iter++] = strtok(NULL, " ")))
 			;
 
 	   /* ok, this is a valid line, because every line in the new trace file
@@ -258,6 +293,18 @@ struct scenario *parse_ns2_new_wireless_scenario(const char *file)
 
 	if (line)
 		free(line);
+
+	/* do traffic profile calculation for every
+	 * node and the whole scenarion:
+	 *
+	 * 1. fseek() to the beginning of the file
+	 * 2. while over the file
+	 * 3. accumulate the bandwith consumption based
+	 *    on a) node and b) protocol.
+	 * 4. map these second samples to every node
+	 */
+	fseek(fp, 0L, SEEK_SET);
+	calculate_traffic_profile(scenario, fp);
 
 	fclose(fp);
 
