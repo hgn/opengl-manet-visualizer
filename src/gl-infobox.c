@@ -24,7 +24,7 @@
 extern struct globals globals;
 
 int frame,time,timebase=0;
-char s[30];
+char fps[64];
 
 
 void draw_infobox(void)
@@ -53,12 +53,12 @@ void draw_infobox(void)
 
 	/* draw border */
 
-	snprintf(s_time_str, sizeof(s_time_str), "Time: %.2lfs", simulator_time());
+	snprintf(s_time_str, sizeof(s_time_str), "Simulation Time: %.2lfs", simulator_time());
 
 	x = 7.0, y = 17.0;
 	draw_text(msg, &x, &y);
 	y = 45.0;
-	draw_text(s, &x, &y);
+	draw_text(fps, &x, &y);
 	y = 31.0;
 	draw_text(s_time_str, &x, &y);
 
@@ -70,7 +70,7 @@ void draw_infobox(void)
 	frame++;
 	time=glutGet(GLUT_ELAPSED_TIME);
 	if (time - timebase > 1000) {
-		sprintf(s, "FPS: %4.2f", frame * 1000.0 / (time - timebase));
+		sprintf(fps, "FPS: %4.2f", frame * 1000.0 / (time - timebase));
 		timebase = time;
 		frame = 0;
 	}

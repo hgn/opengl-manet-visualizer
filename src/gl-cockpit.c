@@ -24,6 +24,34 @@ extern struct globals globals;
 #define	COCKPIT_HEIGHT 100
 #define	COCKPIT_MARGIN 0
 
+/* FIXME: this should be initial
+ * calculated */
+#define	COCKPIT_FONT_HEIGHT 12
+
+#define	COCKPIT_OVERALL_WIDTH 300
+
+static void draw_overall_traffic_histogram(void)
+{
+	float x, y;
+
+	/* draw border */
+	glBegin(GL_LINES);
+	glLineWidth(1.0);
+	glColor4ub(0, 0, 0, 255);
+	glVertex2i(COCKPIT_OVERALL_WIDTH + COCKPIT_MARGIN, globals.screen_height - COCKPIT_HEIGHT);
+	glVertex2i(COCKPIT_OVERALL_WIDTH + COCKPIT_MARGIN, globals.screen_height - COCKPIT_MARGIN);
+	glEnd();
+
+	/* draw info text */
+	x = COCKPIT_MARGIN + 5;
+	y = globals.screen_height - COCKPIT_HEIGHT + COCKPIT_FONT_HEIGHT;
+	draw_text("Cumulative Traffic Profile", &x, &y);
+}
+
+static void draw_node_specific_histrogram(void)
+{
+}
+
 void draw_cockpit(void)
 {
 
@@ -52,6 +80,9 @@ void draw_cockpit(void)
 	glVertex2i(COCKPIT_MARGIN, globals.screen_height - COCKPIT_HEIGHT);
 	glVertex2i(globals.screen_width - COCKPIT_MARGIN, globals.screen_height - COCKPIT_HEIGHT);
 	glEnd();
+
+	draw_overall_traffic_histogram();
+	draw_node_specific_histrogram();
 
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
