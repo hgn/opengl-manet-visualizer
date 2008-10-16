@@ -73,13 +73,32 @@ static void draw_node_specific_histrogram(void)
 		display_segments = 20;
 	}
 
+	int i;
+
 
 	if (r_sim_time <= (uint32_t)floor(globals->scenario->end_time)) {
 
 		node = get_node_by_id(globals->scenario, NODE_ID);
 		__list_for_each(iter, &(node->traffic_profile_list)) {
 			tp = list_entry(iter, struct traffic_profile, list);
-			amount = tp->usage[r_sim_time];
+			int segment = 310;
+			int segment_width = 5;
+			for (i = r_sim_time; i < r_sim_time + display_segments; i++) {
+
+				amount = tp->usage[i];
+				int y_ref = globals->screen_height - 15;
+
+				glBegin(GL_QUADS);
+				glColor4ub(255, 0, 0, 100);
+				glVertex2i(segment, y_ref); /* Bottom Left */
+				glVertex2i(segment + segment_width, y_ref); /* Bottom Right */
+				glVertex2i(segment + segment_width, y_ref - (amount/ 50)); /* Top Right */
+				glVertex2i(segment, y_ref - (amount / 50)); /* top left */
+				glEnd();
+
+				segment += segment_width;
+
+			}
 		}
 	} else {
 		amount = 0;
