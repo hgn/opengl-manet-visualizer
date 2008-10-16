@@ -47,6 +47,11 @@ enum image_file_type {
 	TIFF_TYPE
 };
 
+struct opts {
+	char *tracefile;
+	int traceformat;
+};
+
 #define	TRACE_FILE_FAKE 1
 #define	TRACE_FILE_NS2  2
 
@@ -143,6 +148,9 @@ void keyboard(unsigned char, int, int);
 void *xalloc(size_t);
 void die(const char *);
 inline double xstrtod(const char *);
+
+/* getopt.c */
+struct opts *parse_cl_options(int, char **);
 
 /* time.c */
 double simulator_time(void);

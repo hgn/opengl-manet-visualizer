@@ -77,6 +77,8 @@ int main(int ac, char **av)
 
 	print_cli_teaser();
 
+	struct opts *opts = parse_cli_opts(ac, av);
+
 	scenario = parse_offline_scenario(TRACE_FILE_NS2, DEFAULT_PARSER_FILE);
 	if (!scenario) {
 		fprintf(stderr, "Failure in parsing process of file %s, exiting\n",
