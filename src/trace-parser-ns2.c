@@ -274,7 +274,6 @@ struct traffic_profile *get_traffic_profile_for_node(struct scenario *scenario,
 {
 	struct list_head *iter;
 	struct traffic_profile *tp;
-	int found_profile = 0;
 
 	assert(node);
 	assert((uint32_t)floor(scenario->end_time) > 0);
@@ -282,16 +281,12 @@ struct traffic_profile *get_traffic_profile_for_node(struct scenario *scenario,
 	__list_for_each(iter, &(node->traffic_profile_list)) {
 		tp = list_entry(iter, struct traffic_profile, list);
 		if (tp->type == et) {
-			found_profile = 1;
-			break;
+			return tp;
 		}
 	}
 
-	if (!found_profile) { /* new profile (new protocol) -> generate one and add */
-		struct traffic_profile *tp;
-		tp = alloc_traffic_profile(et, (uint32_t)ceil(scenario->end_time));
-		list_add(&tp->list, &node->traffic_profile_list);
-	}
+	tp = alloc_traffic_profile(et, (uint32_t)ceil(scenario->end_time));
+	list_add(&tp->list, &node->traffic_profile_list);
 
 	return tp;
 }
@@ -308,6 +303,8 @@ static void create_rx_traffic_profile(struct scenario *scenario, char  *data[])
 		case ET_PACKET_CBR:
 			node = cbr_rx_origin(scenario, data);
 			tp = get_traffic_profile_for_node(scenario, node, ET_PACKET_CBR);
+			fprintf(stderr, "%p %u %u\n", tp, (uint32_t)floor(xstrtod(data[NS2_TR_TIME])),
+					atoi(data[NS2_AGT_DATA_AMOUNT]));
 			tp->usage[(uint32_t)floor(xstrtod(data[NS2_TR_TIME]))] += atoi(data[NS2_AGT_DATA_AMOUNT]);
 			break;
 		case ET_PACKET_OLSR:
