@@ -32,6 +32,10 @@
 #define	NS2_TR_PROTO_L    18
 #define	NS2_TR_PROTO_OLSR 34
 
+#define	NS2_AGT_DATA_AMOUNT  36
+
+extern struct globals *globals;
+
 static int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
 {
 	double mtime;
@@ -45,7 +49,7 @@ static int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
 	if (!data[NS2_TR_TIME] || !data[NS2_TR_NODE_ID] || !data[NS2_TR_POS_X] || !data[NS2_TR_POS_Y])
 		return 0;
 
-	mtime   = strtod(data[NS2_TR_TIME], NULL);
+	mtime   = xstrtod(data[NS2_TR_TIME]);
 	nodeid = atoi(data[NS2_TR_NODE_ID]);
 	x      = atoi(data[NS2_TR_POS_X]);
 	y      = atoi(data[NS2_TR_POS_Y]);
@@ -68,7 +72,7 @@ static int parse_ns2_new_wireless_position(struct scenario *s, char *data[])
  * like agt or olsr routing packets. As a rule of thumb:
  * detect here all what you want to display.
  */
-static enum event_type packet_type(char *data[])
+static enum event_type packet_type_rx(char *data[])
 {
 	/* it is a valid date that a line is not always
 	 * of the same length -> sanity checks first */
@@ -81,6 +85,28 @@ static enum event_type packet_type(char *data[])
 		return ET_PACKET_CBR;
 	} else if (!strcmp(data[NS2_TR_PROTO_OLSR], "UM-OLSR") &&
 			!strcmp(data[NS2_TR_EV_TYPE], "r")) {
+		return ET_PACKET_OLSR;
+	} else {
+		return ET_UNKNOWN;
+	}
+}
+
+/**
+ * The same as packet_type_rx but for sender side
+ */
+static enum event_type packet_type_tx(char *data[])
+{
+	/* it is a valid date that a line is not always
+	 * of the same length -> sanity checks first */
+	if (!data[NS2_TR_PROTO_L])
+		return ET_UNKNOWN;
+
+
+	if (!strcmp(data[NS2_TR_PROTO_L], "AGT") &&
+			!strcmp(data[NS2_TR_EV_TYPE], "t")) {
+		return ET_PACKET_CBR;
+	} else if (!strcmp(data[NS2_TR_PROTO_OLSR], "UM-OLSR") &&
+			!strcmp(data[NS2_TR_EV_TYPE], "t")) {
 		return ET_PACKET_OLSR;
 	} else {
 		return ET_UNKNOWN;
@@ -152,6 +178,13 @@ static int map_olsr_data(void *p, char *d[])
 	return 1;
 }
 
+static void account_simulation_end_time(struct scenario *s, char *data[])
+{
+	assert(s && data[NS2_TR_TIME]);
+
+	s->end_time = xstrtod(data[NS2_TR_TIME]);
+}
+
 
 /**
  * parse ns2 new wireless trace line and enqueue important events
@@ -166,7 +199,7 @@ static void parse_ns2_new_wireless_event(struct scenario *s, char *data[])
 	assert(s && data[NS2_TR_TIME]);
 
 	/* categorize event */
-	et = packet_type(data);
+	et = packet_type_rx(data);
 
 	switch (et) {
 		case ET_PACKET_CBR:
@@ -197,6 +230,104 @@ static void parse_ns2_new_wireless_event(struct scenario *s, char *data[])
 	}
 }
 
+static uint32_t *alloc_traffic_profile(enum event_type et, uint32_t seconds)
+{
+	struct traffic_profile *tp;
+
+	assert(seconds > 0);
+
+	tp = xalloc(sizeof(struct traffic_profile));
+
+	tp->usage = xalloc(sizeof(uint32_t) * seconds);
+	tp->type = et;
+
+	INIT_LIST_HEAD(&tp->list);
+
+	return tp;
+}
+
+#define	POS_NI 8
+struct node *cbr_rx_origin(struct scenario *scenario, char *data[])
+{
+	int node_id;
+	struct node *n;
+
+	assert(data[POS_NI]);
+
+	node_id = atoi(data[POS_NI]);
+
+	n = get_node_by_id(scenario, node_id);
+	if (!n) {
+		fprintf(stderr, "Node %d not in database, seems like a programming error\n", n);
+		exit(EXIT_FAILURE);
+	}
+
+	return n;
+}
+
+struct node *olsr_rx_origin(char *data[])
+{
+}
+
+struct traffic_profile *get_traffic_profile_for_node(struct scenario *scenario,
+		struct node *node, enum event_type et)
+{
+	struct list_head *iter;
+	struct traffic_profile *tp;
+	int found_profile = 0;
+
+	assert(node);
+	assert((uint32_t)floor(scenario->end_time) > 0);
+
+	__list_for_each(iter, &(node->traffic_profile_list)) {
+		tp = list_entry(iter, struct traffic_profile, list);
+		if (tp->type == et) {
+			found_profile = 1;
+			break;
+		}
+	}
+
+	if (!found_profile) { /* new profile (new protocol) -> generate one and add */
+		struct traffic_profile *tp;
+		tp = alloc_traffic_profile(et, (uint32_t)ceil(scenario->end_time));
+		list_add(&tp->list, &node->traffic_profile_list);
+	}
+
+	return tp;
+}
+
+static void create_rx_traffic_profile(struct scenario *scenario, char  *data[])
+{
+	enum event_type et;
+	struct node *node;
+	struct traffic_profile *tp;
+
+	et = packet_type_rx(data);
+
+	switch (et) {
+		case ET_PACKET_CBR:
+			node = cbr_rx_origin(scenario, data);
+			tp = get_traffic_profile_for_node(scenario, node, ET_PACKET_CBR);
+			tp->usage[(uint32_t)floor(xstrtod(data[NS2_TR_TIME]))] += atoi(data[NS2_AGT_DATA_AMOUNT]);
+			break;
+		case ET_PACKET_OLSR:
+			node = olsr_rx_origin(data);
+			break;
+		case ET_UNKNOWN:
+			/* packet is not handled or even recognized
+			 * so ignore it here */
+			break;
+		default:
+			fprintf(stderr, "Programmed error in switch/case statement\n");
+			exit(EXIT_FAILURE);
+	}
+}
+
+static void create_tx_traffic_profile(struct scenario *scenario, char  *data[])
+{
+}
+
+
 static void calculate_traffic_profile(struct scenario *scenario, FILE *fp)
 {
 	char *line = NULL;
@@ -213,10 +344,6 @@ static void calculate_traffic_profile(struct scenario *scenario, FILE *fp)
 		for (iter = 0; iter < NS2_TRACE_MAX_DATA; iter++)
 			data[iter] = NULL;
 
-		/* format description:
-		 * http://www.isi.edu/nsnam/ns/doc/node186.html
-		 */
-
 		iter = 0;
 
 		data[iter++] = strtok(line, " ");
@@ -224,7 +351,9 @@ static void calculate_traffic_profile(struct scenario *scenario, FILE *fp)
 		while (iter < NS2_TRACE_MAX_DATA && (data[iter++] = strtok(NULL, " ")))
 			;
 
-	   line_no++;
+		create_rx_traffic_profile(scenario, data);
+
+		line_no++;
 
 	}
 
@@ -286,6 +415,8 @@ struct scenario *parse_ns2_new_wireless_scenario(const char *file)
 	   /* now we save event relevant information like the reception
 		* of a data packet et cetera */
 	   parse_ns2_new_wireless_event(scenario, data);
+
+	   account_simulation_end_time(scenario, data);
 
 	   line_no++;
 

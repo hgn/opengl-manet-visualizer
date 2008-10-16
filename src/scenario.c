@@ -74,21 +74,6 @@ void print_all_events_info(struct scenario *s)
 	}
 }
 
-struct node *get_node_by_id(struct scenario *s, uint32_t id)
-{
-	struct list_head *iter;
-	struct node *node_ptr;
-
-	assert(s);
-
-	__list_for_each(iter, &(s->node_list)) {
-		node_ptr = list_entry(iter, struct node, list);
-		if (node_ptr->id == id)
-			return node_ptr;
-	}
-
-	return NULL;
-}
 
 
 /* vim: set tw=78 ts=4 sw=4 sts=4 ff=unix noet: */

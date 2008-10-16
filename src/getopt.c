@@ -46,8 +46,8 @@ struct opts *parse_cl_options(int ac, char **av)
 	opts = xalloc(sizeof(struct opts));
 
 	/* initial set ups - defaults */
-	opts->tracefile            = DEFAULT_POPULATION_SIZE;
-	opts->traceformat         = DEFAULT_MUTATION_MODE;
+    //opts->tracefile            = DEFAULT_POPULATION_SIZE;
+	//opts->traceformat         = DEFAULT_MUTATION_MODE;
 
 	opt = getopt_long(ac, av, optstr, lopts, &inx );
 

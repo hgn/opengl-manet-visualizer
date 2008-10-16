@@ -20,7 +20,7 @@
 #include <locale.h>
 #include <sys/utsname.h>
 
-struct globals globals;
+struct globals *globals;
 struct scenario *scenario;
 struct list_head *a_ev_l;
 static struct event *next_event = NULL;
@@ -77,7 +77,13 @@ int main(int ac, char **av)
 
 	print_cli_teaser();
 
-	struct opts *opts = parse_cli_opts(ac, av);
+	globals = xalloc(sizeof(struct globals));
+
+	globals->opts = parse_cl_options(ac, av);
+	if (!globals->opts) {
+		fprintf(stderr, "Error in parsing commandline options, exiting\n");
+		exit(EXIT_FAILURE);
+	}
 
 	scenario = parse_offline_scenario(TRACE_FILE_NS2, DEFAULT_PARSER_FILE);
 	if (!scenario) {
@@ -85,11 +91,11 @@ int main(int ac, char **av)
 				DEFAULT_PARSER_FILE);
 		exit(EXIT_FAILURE);
 	}
+	globals->scenario = scenario;
 
 	/* we got all information about node (quantity, position, et cetera)
 	 * we now calculate some derived information like node color */
 	init_nodes(scenario);
-
 
 	a_ev_l = init_active_event_list();
 	setup_simulator_ref_time();

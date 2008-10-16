@@ -131,6 +131,8 @@ struct scenario {
 
 struct globals {
 	uint32_t screen_width, screen_height;
+	struct opts *opts;
+	struct scenario *scenario;
 };
 
 
@@ -189,7 +191,6 @@ void cli_display_events(struct list_head *);
 
 /* scenario.c */
 struct scenario *alloc_scenario(void);
-struct node *get_node_by_id(struct scenario *, uint32_t);
 int add_node_to_scenario(struct scenario *, struct node *);
 
 void print_nodes_info(struct scenario *);
@@ -200,6 +201,7 @@ void init_nodes(struct scenario *);
 int get_node_pos_by_time(struct node *, double, float *, float *);
 struct node *alloc_node(uint32_t);
 void add_position_data_to_node(struct node *, double, uint32_t, uint32_t);
+struct node *get_node_by_id(struct scenario *, uint32_t);
 
 /* gl-nodes.c */
 int init_gl_nodes(void);

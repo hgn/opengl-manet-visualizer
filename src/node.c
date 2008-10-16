@@ -21,6 +21,8 @@
 #include <inttypes.h>
 #include <assert.h>
 
+extern struct scenario *scenario;
+extern struct globals *globals;
 
 int get_node_pos_by_time(struct node *node, double search_time, float *x, float *y)
 {
@@ -42,8 +44,6 @@ int get_node_pos_by_time(struct node *node, double search_time, float *x, float 
 	 */
 
 	co_prev = co_next = &null_position;
-
-
 
 	__list_for_each_prev(iter, &(node->position_list)) {
 		coordinate = list_entry(iter, struct position, list);
@@ -80,6 +80,27 @@ int get_node_pos_by_time(struct node *node, double search_time, float *x, float 
 	*y = (((float)w_next_y - w_prev_y) / (((float)t_next - t_prev) / t_t - t_prev)) + w_prev_y;
 
 	return 1;
+}
+
+/**
+ * Return a pointer to the searched node
+ * or NULL if the node is not known
+ */
+struct node *get_node_by_id(struct scenario *scenario, uint32_t id)
+{
+	struct list_head *iter;
+	struct node *node_ptr;
+
+	assert(scenario);
+
+	__list_for_each(iter, &(scenario->node_list)) {
+		node_ptr = list_entry(iter, struct node, list);
+		if (node_ptr->id == id) {
+			return node_ptr;
+		}
+	}
+
+	return NULL;
 }
 
 struct node *alloc_node(uint32_t id)

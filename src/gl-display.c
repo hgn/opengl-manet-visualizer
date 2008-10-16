@@ -26,7 +26,7 @@ float CAMERA_Move = 1.0f;
 
 float xpos = 0, ypos = 0, zpos = 0, xrot = 0, yrot = 0, angle=0.0;
 
-extern struct globals globals;
+extern struct globals *globals;
 
 void reshape(int w, int h)
 {
@@ -34,8 +34,8 @@ void reshape(int w, int h)
 		h = 1;
 	}
 
-	globals.screen_width = w;
-	globals.screen_height = h;
+	globals->screen_width = w;
+	globals->screen_height = h;
 
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 

@@ -21,7 +21,7 @@
 
 #define MESSAGE	"MANET Network Visualizer"
 
-extern struct globals globals;
+extern struct globals *globals;
 
 int frame,time,timebase=0;
 char fps[64];
@@ -33,11 +33,11 @@ void draw_infobox(void)
 	char s_time_str[64];
 	float x, y;
 
-	glViewport(0, 0, globals.screen_width, globals.screen_height);
+	glViewport(0, 0, globals->screen_width, globals->screen_height);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0, globals.screen_width, globals.screen_height, 0, -1, 1);
+	glOrtho(0, globals->screen_width, globals->screen_height, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();

@@ -19,7 +19,7 @@
 #include "global.h"
 #include <assert.h>
 
-extern struct globals globals;
+extern struct globals *globals;
 
 #define	COCKPIT_HEIGHT 100
 #define	COCKPIT_MARGIN 0
@@ -38,28 +38,69 @@ static void draw_overall_traffic_histogram(void)
 	glBegin(GL_LINES);
 	glLineWidth(1.0);
 	glColor4ub(0, 0, 0, 255);
-	glVertex2i(COCKPIT_OVERALL_WIDTH + COCKPIT_MARGIN, globals.screen_height - COCKPIT_HEIGHT);
-	glVertex2i(COCKPIT_OVERALL_WIDTH + COCKPIT_MARGIN, globals.screen_height - COCKPIT_MARGIN);
+	glVertex2i(COCKPIT_OVERALL_WIDTH + COCKPIT_MARGIN, globals->screen_height - COCKPIT_HEIGHT);
+	glVertex2i(COCKPIT_OVERALL_WIDTH + COCKPIT_MARGIN, globals->screen_height - COCKPIT_MARGIN);
 	glEnd();
 
 	/* draw info text */
 	x = COCKPIT_MARGIN + 5;
-	y = globals.screen_height - COCKPIT_HEIGHT + COCKPIT_FONT_HEIGHT;
+	y = globals->screen_height - COCKPIT_HEIGHT + COCKPIT_FONT_HEIGHT;
 	draw_text("Cumulative Traffic Profile", &x, &y);
 }
 
+#define	NODE_ID 2
+
 static void draw_node_specific_histrogram(void)
 {
+	float x, y;
+
+	struct node *node;
+	struct list_head *iter;
+	struct traffic_profile *tp;
+	uint32_t amount;
+	char tmp_txt[64];
+
+	uint32_t r_sim_time = floor(simulator_time());
+
+
+#define	SEGMENTS 20
+
+	int display_segments;
+
+	if (r_sim_time < SEGMENTS) {
+		display_segments = r_sim_time;
+	} else {
+		display_segments = 20;
+	}
+
+
+	if (r_sim_time <= (uint32_t)floor(globals->scenario->end_time)) {
+
+		node = get_node_by_id(globals->scenario, NODE_ID);
+		__list_for_each(iter, &(node->traffic_profile_list)) {
+			tp = list_entry(iter, struct traffic_profile, list);
+			amount = tp->usage[r_sim_time];
+		}
+	} else {
+		amount = 0;
+	}
+
+
+	/* draw info text */
+	x = COCKPIT_MARGIN + 5;
+	y = globals->screen_height - COCKPIT_HEIGHT + COCKPIT_FONT_HEIGHT + 20;
+	snprintf(tmp_txt, 63, "Traffic node %d: %u byte\n", NODE_ID, amount);
+	draw_text(tmp_txt, &x, &y);
 }
 
 void draw_cockpit(void)
 {
 
-	glViewport(0, 0, globals.screen_width, globals.screen_height);
+	glViewport(0, 0, globals->screen_width, globals->screen_height);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0, globals.screen_width, globals.screen_height, 0, -1, 1);
+	glOrtho(0, globals->screen_width, globals->screen_height, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
@@ -67,18 +108,18 @@ void draw_cockpit(void)
 	/* draw transparent box */
 	glBegin(GL_QUADS);
 	glColor4ub(200, 200, 200, 100);
-	glVertex2i( COCKPIT_MARGIN, globals.screen_height - COCKPIT_MARGIN); /* Bottom Left */
-	glVertex2i( globals.screen_width - COCKPIT_MARGIN, globals.screen_height - COCKPIT_MARGIN); /* Bottom Right */
-	glVertex2i( globals.screen_width - COCKPIT_MARGIN, globals.screen_height - COCKPIT_HEIGHT); /* Top Right */
-	glVertex2i( COCKPIT_MARGIN, globals.screen_height - COCKPIT_HEIGHT); /* top left */
+	glVertex2i( COCKPIT_MARGIN, globals->screen_height - COCKPIT_MARGIN); /* Bottom Left */
+	glVertex2i( globals->screen_width - COCKPIT_MARGIN, globals->screen_height - COCKPIT_MARGIN); /* Bottom Right */
+	glVertex2i( globals->screen_width - COCKPIT_MARGIN, globals->screen_height - COCKPIT_HEIGHT); /* Top Right */
+	glVertex2i( COCKPIT_MARGIN, globals->screen_height - COCKPIT_HEIGHT); /* top left */
 	glEnd();
 
 	/* draw a upper border */
 	glBegin(GL_LINES);
 	glLineWidth(1.0);
 	glColor4ub(0, 0, 0, 255);
-	glVertex2i(COCKPIT_MARGIN, globals.screen_height - COCKPIT_HEIGHT);
-	glVertex2i(globals.screen_width - COCKPIT_MARGIN, globals.screen_height - COCKPIT_HEIGHT);
+	glVertex2i(COCKPIT_MARGIN, globals->screen_height - COCKPIT_HEIGHT);
+	glVertex2i(globals->screen_width - COCKPIT_MARGIN, globals->screen_height - COCKPIT_HEIGHT);
 	glEnd();
 
 	draw_overall_traffic_histogram();
