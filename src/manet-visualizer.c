@@ -72,6 +72,7 @@ static void print_cli_teaser(void)
 
 int main(int ac, char **av)
 {
+	char *trace_file;
 
 	setlocale(LC_ALL, "C");
 
@@ -85,7 +86,15 @@ int main(int ac, char **av)
 		exit(EXIT_FAILURE);
 	}
 
-	scenario = parse_offline_scenario(TRACE_FILE_NS2, DEFAULT_PARSER_FILE);
+	if (ac == 2) {
+		/* thirst command line argument is considered
+		 * as trace file */
+		trace_file = av[1];
+	} else {
+		trace_file = DEFAULT_PARSER_FILE;
+	}
+
+	scenario = parse_offline_scenario(TRACE_FILE_NS2, trace_file);
 	if (!scenario) {
 		fprintf(stderr, "Failure in parsing process of file %s, exiting\n",
 				DEFAULT_PARSER_FILE);

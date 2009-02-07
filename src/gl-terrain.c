@@ -22,7 +22,6 @@
 
 static GLuint ground_textures[1];
 
-#define TERRAIN_WIDTH 50
 
 
 extern struct scenario *scenario;
@@ -44,8 +43,8 @@ int init_terrain(void)
 	/* prevent a null map -> if all nodes are static on the
 	   same position
 	*/
-	max_x = 50;
-	max_z = 50;
+	max_x = 1000;
+	max_z = 1000;
 
 	/* load textures required textures */
 	image = load_image("/usr/share/manet-visualizer/textures/ground-01/grass.bmp", BMP_TYPE);
@@ -82,81 +81,71 @@ int init_terrain(void)
 	glVertex3f(-100.0f, -1.0f, -100.0f);
 
 	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(-100.0f, -1.0f, max_z * 10);
+	glVertex3f(-100.0f, -1.0f, max_z);
 
 	glTexCoord2f(100.f, 0.0f);
-	glVertex3f(max_x, -1.0f, max_z * 10);
+	glVertex3f(max_x, -1.0f, max_z);
 
 	glTexCoord2f(100.f, 100.f);
-	glVertex3f(max_x * 10, -1.0f, -100.0f);
+	glVertex3f(max_x, -1.0f, -100.0f);
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);
 
 	glEndList();
 
-
 #if 0
 
-	int x, y, n, a, b;
-
-	int max_border = max_x > max_z ? max_x : max_z;
 
 
-	float **terrain = xalloc(TERRAIN_WIDTH * sizeof(float *));
-	for (i = 0; i < TERRAIN_WIDTH; i++) {
-		terrain[i] = xalloc(max_border * sizeof(float));
-	}
+#define tWidth  200
+#define tHeight 200
+	int x, y, n, a, b, i;
+	float terrain[tWidth][tHeight];
 
-
-
-
-
-    // Generate random height points
-    for(x = 0; x < TERRAIN_WIDTH; x++) {
-        for(y = 0; y < max_border; y++){
-            terrain[x][y] = (rand()%100) * .01;
+  // Generate random height points
+    for(x = 0; x<tWidth; x++){
+        for(y = 0; y<tHeight; y++){
+            terrain[x][y] = (rand()%1000) * .01;
         }
     }
 
-
     // Smooth terrain (reduce jaggedness)
-	for(n = 0; n<2; n++){
-		for(x = 0; x<WIDTH; x++){
-			for(y = 0; y<HEIGHT; y++){
-				for(a = -1; a < 2; a++){
-					for(b = -1; b < 2; b++){
-						if(x+a>=0 && x+a<WIDTH && y+b>=0 && y+b<HEIGHT)
-						{terrain[x][y]+=terrain[x+a][y+b];}
-					}
-				}
-				terrain[x][y] *= .075;
-			}
-		}
-	}
-
+    for(n = 0; n<2; n++){
+        for(x = 0; x<tWidth; x++){
+            for(y = 0; y<tHeight; y++){
+                for(a = -1; a < 2; a++){
+                    for(b = -1; b < 2; b++){
+                        if(x+a>=0 && x+a<tWidth && y+b>=0 && y+b<tHeight)
+                            {terrain[x][y]+=terrain[x+a][y+b];}
+                    }
+                }
+                terrain[x][y] *= .08;
+            }
+        }
+    }
 
 	terrain_outer_list = glGenLists(1);
 	glNewList(terrain_outer_list, GL_COMPILE);
 
+    // Terrain rendering routine goes here
+    glTranslatef(-tWidth/2, 0, -tHeight/2);
     glBegin(GL_QUADS);
-    for(x = 0; x< TERRAIN_WIDTH - 1; x++){
-        for(y = 0; y< max_border - 1; y++){
-
-			glNormal3f(0.0f, 1.0f, 0.0f);
-            glVertex3f(x+0+max_x, terrain[x+0][y+1], y+1+max_z);
-            glVertex3f(x+1+max_x, terrain[x+1][y+1], y+1+max_z);
-            glVertex3f(x+1+max_x, terrain[x+1][y+0], y+0+max_z);
-            glVertex3f(x+0+max_x, terrain[x+0][y+0], y+0+max_z);
+    for(x = 0; x<tWidth-1; x++){
+        for(y = 0; y<tHeight-1; y++){
+            glVertex3f(x+0, terrain[x+0][y+1] - 5, y+1);
+            glVertex3f(x+1, terrain[x+1][y+1] - 5, y+1);
+            glVertex3f(x+1, terrain[x+1][y+0] - 5, y+0);
+            glVertex3f(x+0, terrain[x+0][y+0] - 5, y+0);
         }
     }
+    glEnd();
+    glEndList();
 
-	glEnd();
 
 	glEndList();
 
 
-	free(terrain);
 
 #endif
 
@@ -173,7 +162,7 @@ void draw_terrain(void)
 
 
 	glCallList(terrain_inner_list);
-	glCallList(terrain_outer_list);
+	//glCallList(terrain_outer_list);
 
 	if (grid_active) {
 
