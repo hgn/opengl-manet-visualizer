@@ -1,4 +1,4 @@
-NS3_HOME=../ns-3-dev
+NS3_HOME=../../ns-3-dev
 NS3_BUILD=${NS3_HOME}/build/debug
 
 INC_DIR=${NS3_BUILD}/

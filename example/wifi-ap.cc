@@ -10,6 +10,15 @@
 
 using namespace ns3;
 
+void get_mac_src(Ptr < const Packet > p)
+{
+	LlcSnapHeader llc;
+
+	p->PeekHeader(llc);
+
+	std::cout << "DATE: " << llc.GetSerializedSize() << std::endl;
+}
+
 void
 rx_packet(std::string context, Ptr < const Packet > p, Mac48Address address)
 {
@@ -29,7 +38,9 @@ rx_packet(std::string context, Ptr < const Packet > p, Mac48Address address)
 				Ptr < MobilityModel > mobility = node->GetObject < MobilityModel > ();
 				pos = mobility->GetPosition();
 				std::cout << "r " << node->GetId() << " " <<
-				    pos.x << " " << pos.y << "size" << p->GetSize() << " " << std::endl;
+				    pos.x << " " << pos.y << "size: " << p->GetSize() << " " << std::endl;
+
+				get_mac_src(p);
 
 				return;
 			}

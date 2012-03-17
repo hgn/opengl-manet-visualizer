@@ -19,7 +19,6 @@
 #ifndef NV_GLOBAL_H
 #define	NV_GLOBAL_H
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -149,7 +148,7 @@ void keyboard(unsigned char, int, int);
 /* util.c */
 void *xalloc(size_t);
 void die(const char *);
-inline double xstrtod(const char *);
+double xstrtod(const char *);
 
 /* getopt.c */
 struct opts *parse_cl_options(int, char **);

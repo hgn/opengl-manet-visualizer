@@ -44,7 +44,7 @@ void *xalloc(size_t size)
 	return ptr;
 }
 
-inline double xstrtod(const char *c_digit)
+double xstrtod(const char *c_digit)
 {
 	double ret;
 	char *endptr;
